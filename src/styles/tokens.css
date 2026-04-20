@@ -1,0 +1,111 @@
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Menlo, monospace;
+
+  --bg-base: #0a0a0a;
+  --bg-window: var(--bg-base);
+  --surface-bg: #121212;
+  --surface-border: #262626;
+  --surface-hover: #1f1f1f;
+
+  --text: #ffffff;
+  --text-primary: var(--text);
+  --text-secondary: #a3a3a3;
+  --text-muted: #52525b;
+  --text-subtle: var(--text-muted);
+
+  --accent: #ffffff;
+  --accent-fg: #000000;
+  --accent-hover: #e5e5e5;
+  --accent-muted: rgba(255, 255, 255, 0.14);
+  --accent-glow: rgba(255, 255, 255, 0.35);
+  --accent-ring: rgba(255, 255, 255, 0.55);
+
+  --border: var(--surface-border);
+  --border-strong: #3f3f46;
+
+  --bg-panel: var(--surface-bg);
+  --bg-panel-deep: #0f0f0f;
+  --bg-input: #171717;
+
+  --status-offline: #737373;
+  --status-connecting: #eab308;
+  --status-online: #22c55e;
+
+  --danger: #f87171;
+  --warn: #fbbf24;
+  --ok: #4ade80;
+
+  --radius-xl: 24px;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.45), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --shadow: var(--shadow-lg);
+
+  --focus-ring: 0 0 0 2px var(--surface-bg), 0 0 0 4px var(--accent);
+  --touch-min: 44px;
+
+  /* Ligne active claire : survol crayon lisible (pas blanc sur blanc) */
+  --active-row-edit-hover-bg: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Menlo, monospace;
+
+  --bg-base: #f4f4f5;
+  --bg-window: var(--bg-base);
+  --surface-bg: #ffffff;
+  --surface-border: #e4e4e7;
+  --surface-hover: #f4f4f5;
+
+  --text: #09090b;
+  --text-primary: var(--text);
+  --text-secondary: #52525b;
+  --text-muted: #a1a1aa;
+  --text-subtle: var(--text-muted);
+
+  --accent: #09090b;
+  --accent-fg: #ffffff;
+  --accent-hover: #27272a;
+  --accent-muted: rgba(9, 9, 11, 0.12);
+  --accent-glow: rgba(9, 9, 11, 0.25);
+  --accent-ring: rgba(9, 9, 11, 0.45);
+
+  --border: var(--surface-border);
+  --border-strong: #d4d4d8;
+
+  --bg-panel: var(--surface-bg);
+  --bg-panel-deep: #fafafa;
+  --bg-input: #f4f4f5;
+
+  --status-offline: #a1a1aa;
+  --status-connecting: #ca8a04;
+  --status-online: #16a34a;
+
+  --danger: #dc2626;
+  --warn: #ca8a04;
+  --ok: #16a34a;
+
+  --radius-xl: 24px;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --shadow: var(--shadow-lg);
+
+  --focus-ring: 0 0 0 2px var(--surface-bg), 0 0 0 4px var(--accent);
+  --touch-min: 44px;
+
+  /* Ligne active sombre : survol crayon lisible (pas noir sur noir) */
+  --active-row-edit-hover-bg: rgba(255, 255, 255, 0.14);
+}

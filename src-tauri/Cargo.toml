@@ -1,0 +1,35 @@
+[package]
+name = "openvpn-gui"
+version = "0.1.0"
+description = "Tauri desktop shell: OpenVPN profile UI, daemon IPC client, recents/history, Linux tun/tap traffic from /proc/net/dev."
+authors = ["OpenVPN-GUI contributors"]
+edition = "2021"
+
+[workspace]
+members = [
+  ".",
+  "crates/openvpn-ipc",
+  "crates/openvpn-daemon",
+]
+resolver = "2"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+name = "openvpn_gui_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+openvpn-ipc = { path = "crates/openvpn-ipc" }
+tauri-plugin-dialog = "2"
+

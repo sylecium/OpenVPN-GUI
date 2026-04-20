@@ -1,0 +1,62 @@
+import * as backend from "../api/backend";
+import { mapStatusLabel } from "../lib/format";
+import { byId } from "../lib/dom";
+import { session } from "../state/session";
+import { setFeedback } from "../ui/feedback";
+import { updateConnectLabels } from "../ui/connect-labels";
+import { refreshTrafficStats } from "./traffic";
+
+function sameProfilePath(a: string, b: string): boolean {
+  return a.trim() === b.trim();
+}
+
+export function syncVpnListRowStatusTexts(): void {
+  const selected = byId<HTMLInputElement>("profile-path").value.trim();
+  const st = session.lastKnownStatus;
+  const active = session.lastActiveProfile;
+  for (const li of document.querySelectorAll<HTMLLIElement>("#vpn-list .vpn-item[data-path]")) {
+    const path = li.dataset.path;
+    if (!path) {
+      continue;
+    }
+    const sub = li.querySelector(".vpn-status-text");
+    if (!sub) {
+      continue;
+    }
+    const activeMatch = active != null && sameProfilePath(active, path);
+    if (st === "connected" && activeMatch) {
+      sub.textContent = "Connecté";
+    } else if (st === "connecting" && sameProfilePath(selected, path)) {
+      sub.textContent = "Connexion…";
+    } else {
+      sub.textContent = "Hors ligne";
+    }
+  }
+}
+
+export async function refreshStatus(): Promise<void> {
+  try {
+    const status = await backend.apiVpnStatus();
+    session.lastKnownStatus = status.status;
+    session.lastActiveProfile = status.activeProfile ?? null;
+
+    const root = byId<HTMLElement>("profile-status-root");
+    root.classList.remove("is-online", "is-connecting", "is-error");
+    if (status.status === "connected") {
+      root.classList.add("is-online");
+    } else if (status.status === "connecting") {
+      root.classList.add("is-connecting");
+    } else if (status.status === "error") {
+      root.classList.add("is-error");
+    }
+
+    byId<HTMLElement>("status-label").textContent = mapStatusLabel(status.status);
+    byId<HTMLElement>("active-profile").textContent = `Profil actif (démon) : ${status.activeProfile ?? "aucun"}`;
+
+    updateConnectLabels(status.status);
+    syncVpnListRowStatusTexts();
+    await refreshTrafficStats();
+  } catch (error) {
+    setFeedback(String(error), true);
+  }
+}

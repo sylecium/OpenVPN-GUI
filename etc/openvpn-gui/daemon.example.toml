@@ -1,0 +1,5 @@
+socket_path = "/run/openvpn-gui/openvpn-gui.sock"
+allowed_uid = 1000
+openvpn_binary = "/usr/sbin/openvpn"
+extra_args = ["--verb", "3"]
+max_logs = 500
