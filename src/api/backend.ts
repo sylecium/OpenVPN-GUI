@@ -27,8 +27,17 @@ export async function apiVpnIfaceTraffic(): Promise<VpnIfaceTraffic> {
   return invoke<VpnIfaceTraffic>("vpn_iface_traffic");
 }
 
+/** Première directive `remote` du fichier (host:port, port par défaut 1194 si absent). */
+export async function apiOvpnRemoteHint(profilePath: string): Promise<string> {
+  return invoke<string>("ovpn_remote_hint", { profilePath });
+}
+
 export async function apiRecentProfiles(): Promise<RecentProfile[]> {
   return invoke<RecentProfile[]>("recent_profiles");
+}
+
+export async function apiReorderRecentProfiles(orderedPaths: string[]): Promise<void> {
+  return invoke("reorder_recent_profiles", { orderedPaths });
 }
 
 export async function apiUpsertRecentProfile(profilePath: string): Promise<void> {

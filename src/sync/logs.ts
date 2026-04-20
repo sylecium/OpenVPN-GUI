@@ -1,7 +1,9 @@
 import * as backend from "../api/backend";
+import { extractRemoteEndpointFromOvpnLogLine } from "../lib/ovpn-remote-parse";
 import { byId } from "../lib/dom";
 import { session } from "../state/session";
 import { setFeedback } from "../ui/feedback";
+import { refreshStatRemoteDisplay } from "../ui/server-meta-view";
 
 /** Nombre max de lignes conservées dans le panneau (évite un DOM trop lourd). */
 const MAX_LOG_LINES_IN_VIEW = 2500;
@@ -30,6 +32,16 @@ export async function refreshLogs(): Promise<void> {
         ? scrollParent.scrollHeight - scrollParent.scrollTop - scrollParent.clientHeight < 48
         : true;
 
+    for (const entry of logs.entries) {
+      const extracted = extractRemoteEndpointFromOvpnLogLine(entry.message);
+      if (extracted && session.lastActiveProfile != null) {
+        session.lastRemoteFromLogs = {
+          path: session.lastActiveProfile,
+          endpoint: extracted,
+        };
+      }
+    }
+
     const lines = logs.entries.map((entry) => {
       const ts = new Date(entry.ts_unix_ms).toLocaleTimeString("fr-FR");
       return `[${ts}] ${entry.level.toUpperCase()} ${entry.message}`;
@@ -42,6 +54,8 @@ export async function refreshLogs(): Promise<void> {
         scrollParent.scrollTop = scrollParent.scrollHeight;
       }
     }
+
+    refreshStatRemoteDisplay();
   } catch (error) {
     setFeedback(String(error), true);
   }

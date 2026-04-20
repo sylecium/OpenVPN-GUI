@@ -26,3 +26,4 @@ dist-ssr
 .cursor
 .omc
 .vscode
+.husky

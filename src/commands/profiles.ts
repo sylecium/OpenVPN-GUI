@@ -1,9 +1,8 @@
 import { open } from "@tauri-apps/plugin-dialog";
 import * as backend from "../api/backend";
-import { basename } from "../lib/format";
 import { byId } from "../lib/dom";
 import { setFeedback } from "../ui/feedback";
-import { updateServerMetaForFilename, resetServerMetaEmpty } from "../ui/server-meta-view";
+import { refreshServerMetaForProfile, resetServerMetaEmpty } from "../ui/server-meta-view";
 import { refreshRecentProfiles, syncVpnSidebarFromProfilePath } from "../sync/profiles";
 import { refreshStatus } from "../sync/status";
 import { session } from "../state/session";
@@ -24,7 +23,7 @@ export async function applyPickedProfile(selectedPath: string): Promise<void> {
     await upsertFromPath(selectedPath);
     return;
   }
-  updateServerMetaForFilename(basename(selectedPath));
+  refreshServerMetaForProfile(selectedPath);
   setFeedback("Profil sélectionné");
   syncVpnSidebarFromProfilePath();
 }
@@ -65,7 +64,7 @@ export async function removeProfileFromRecents(profilePath: string): Promise<voi
 export function onServerSelectChange(value: string): void {
   byId<HTMLInputElement>("profile-path").value = value;
   if (value) {
-    updateServerMetaForFilename(basename(value));
+    refreshServerMetaForProfile(value);
     setFeedback("Profil sélectionné");
   } else {
     resetServerMetaEmpty();

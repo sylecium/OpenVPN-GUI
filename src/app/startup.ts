@@ -92,8 +92,7 @@ export async function runInitialSync(): Promise<void> {
 
 export function startIntervals(): void {
   window.setInterval(() => {
-    void refreshStatus();
-    void refreshLogs();
+    void refreshStatus().then(() => refreshLogs());
   }, 1800);
 
   window.setInterval(() => {

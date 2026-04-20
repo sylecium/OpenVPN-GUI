@@ -66,6 +66,8 @@ export function createVpnSidebarRow(profile: {
     li.classList.add("vpn-item--demo");
   } else {
     li.dataset.path = profile.path;
+    li.draggable = true;
+    li.title = "Glisser-déposer pour réordonner les profils";
   }
 
   const left = document.createElement("div");
@@ -88,6 +90,7 @@ export function createVpnSidebarRow(profile: {
 
   const editBtn = document.createElement("button");
   editBtn.type = "button";
+  editBtn.draggable = false;
   editBtn.className = "row-action row-action--edit";
   editBtn.dataset.ovpnAction = "edit";
   editBtn.setAttribute("aria-label", "Modifier le profil (nom affiché, chemin)");
@@ -105,6 +108,7 @@ export function createVpnSidebarRow(profile: {
 
   const delBtn = document.createElement("button");
   delBtn.type = "button";
+  delBtn.draggable = false;
   delBtn.className = "row-action row-action--remove";
   delBtn.dataset.ovpnAction = "remove";
   delBtn.setAttribute("aria-label", "Retirer de la liste");

@@ -1,5 +1,6 @@
 mod vpn_ipc;
 
+use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -130,6 +131,59 @@ fn vpn_iface_traffic() -> Result<VpnIfaceTraffic, String> {
     parse_tun_tap_traffic()
 }
 
+/// Première directive `remote` du profil (host:port ; port 1194 si omis, comme OpenVPN par défaut).
+#[tauri::command]
+fn ovpn_remote_hint(profile_path: String) -> Result<String, String> {
+    let path = profile_path.trim();
+    if path.is_empty() {
+        return Err("chemin vide".to_string());
+    }
+    let raw = fs::read_to_string(path).map_err(|e| format!("lecture du profil impossible : {e}"))?;
+    parse_ovpn_remote_display(&raw).ok_or_else(|| "aucune directive remote dans le fichier".to_string())
+}
+
+#[cfg(test)]
+mod ovpn_parse_tests {
+    use super::parse_ovpn_remote_display;
+
+    #[test]
+    fn parses_remote_host_port() {
+        let s = "client\nremote 10.0.0.1 443\n";
+        assert_eq!(parse_ovpn_remote_display(s).as_deref(), Some("10.0.0.1:443"));
+    }
+
+    #[test]
+    fn defaults_port_when_omitted() {
+        let s = "remote vpn.example.com\n";
+        assert_eq!(
+            parse_ovpn_remote_display(s).as_deref(),
+            Some("vpn.example.com:1194")
+        );
+    }
+}
+
+fn parse_ovpn_remote_display(content: &str) -> Option<String> {
+    for raw_line in content.lines() {
+        let line = raw_line.trim();
+        if line.is_empty() || line.starts_with('#') || line.starts_with(';') {
+            continue;
+        }
+        let mut parts = line.split_whitespace();
+        let keyword = parts.next()?;
+        if !keyword.eq_ignore_ascii_case("remote") {
+            continue;
+        }
+        let host = parts.next()?;
+        let port: u16 = parts
+            .next()
+            .filter(|t| !t.is_empty() && t.chars().all(|c| c.is_ascii_digit()))
+            .and_then(|t| t.parse().ok())
+            .unwrap_or(1194);
+        return Some(format!("{host}:{port}"));
+    }
+    None
+}
+
 #[tauri::command]
 fn remove_recent_profile(profile_path: String) -> Result<(), String> {
     let path = recent_profiles_path();
@@ -140,10 +194,34 @@ fn remove_recent_profile(profile_path: String) -> Result<(), String> {
 
 #[tauri::command]
 fn recent_profiles() -> Result<Vec<RecentProfile>, String> {
-    read_json_file::<Vec<RecentProfile>>(&recent_profiles_path()).map(|mut items| {
-        items.sort_by(|a, b| b.last_used_unix_ms.cmp(&a.last_used_unix_ms));
-        items
-    })
+    read_json_file::<Vec<RecentProfile>>(&recent_profiles_path())
+}
+
+#[tauri::command]
+fn reorder_recent_profiles(ordered_paths: Vec<String>) -> Result<(), String> {
+    let path = recent_profiles_path();
+    let current = read_json_file::<Vec<RecentProfile>>(&path)?;
+    if ordered_paths.len() != current.len() {
+        return Err("réordonnancement invalide : nombre de profils incohérent".to_string());
+    }
+    let mut map: HashMap<String, RecentProfile> = current
+        .into_iter()
+        .map(|entry| (entry.path.clone(), entry))
+        .collect();
+    if map.len() != ordered_paths.len() {
+        return Err("réordonnancement invalide : doublons dans la liste enregistrée".to_string());
+    }
+    let mut reordered = Vec::with_capacity(ordered_paths.len());
+    for path_entry in ordered_paths {
+        let Some(entry) = map.remove(&path_entry) else {
+            return Err(format!("réordonnancement invalide : profil inconnu ({path_entry})"));
+        };
+        reordered.push(entry);
+    }
+    if !map.is_empty() {
+        return Err("réordonnancement invalide : ordre incomplet".to_string());
+    }
+    write_json_file(&path, &reordered)
 }
 
 #[tauri::command]
@@ -161,8 +239,8 @@ fn upsert_recent_profile(profile_path: String) -> Result<(), String> {
             display_name: None,
         });
     }
-    current.sort_by(|a, b| b.last_used_unix_ms.cmp(&a.last_used_unix_ms));
     if current.len() > 20 {
+        current.sort_by(|a, b| b.last_used_unix_ms.cmp(&a.last_used_unix_ms));
         current.truncate(20);
     }
     write_json_file(&path, &current)
@@ -385,7 +463,9 @@ pub fn run() {
             vpn_status,
             vpn_logs,
             vpn_iface_traffic,
+            ovpn_remote_hint,
             recent_profiles,
+            reorder_recent_profiles,
             upsert_recent_profile,
             remove_recent_profile,
             history_entries,
