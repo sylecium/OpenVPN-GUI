@@ -7,6 +7,7 @@ import { refreshServerMetaForProfile, resetServerMetaEmpty } from "../ui/server-
 import { createVpnSidebarRow } from "../ui/ovpn-row";
 import { syncVpnListRowStatusTexts, syncProfileStatusIndicator } from "./status";
 import { t } from "../i18n";
+import { getGroupCollapsed, setGroupCollapsed } from "../lib/ui-store";
 
 let vpnListDragAbort: AbortController | null = null;
 
@@ -290,7 +291,13 @@ export async function refreshRecentProfiles(): Promise<void> {
     for (const groupName of sortedGroups) {
       const details = document.createElement("details");
       details.className = "vpn-group";
-      details.open = true;
+      // Restaure l'état persisté : ouvert par défaut, replié si mémorisé
+      details.open = !getGroupCollapsed(groupName);
+
+      // Sauvegarde l'état à chaque fois que l'utilisateur replie/déplie
+      details.addEventListener("toggle", () => {
+        setGroupCollapsed(groupName, !details.open);
+      });
 
       const summary = document.createElement("summary");
       summary.className = "vpn-group-header";

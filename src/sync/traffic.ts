@@ -3,6 +3,11 @@ import { formatBitrate, formatBytes } from "../lib/format";
 import { byId } from "../lib/dom";
 import { session } from "../state/session";
 import { t } from "../i18n";
+import {
+  getSessionTrafficBase,
+  setSessionTrafficBase,
+  clearSessionTrafficBase,
+} from "../lib/ui-store";
 
 export async function refreshTrafficStats(): Promise<void> {
   const downEl = byId<HTMLElement>("stat-down");
@@ -21,6 +26,10 @@ export async function refreshTrafficStats(): Promise<void> {
 
   if (session.lastKnownStatus !== "connected") {
     session.lastTrafficSample = null;
+    if (session.sessionTrafficBase !== null) {
+      // La session vient de se terminer : on efface la base persistée
+      clearSessionTrafficBase();
+    }
     session.sessionTrafficBase = null;
     clearUI();
     return;
@@ -31,7 +40,31 @@ export async function refreshTrafficStats(): Promise<void> {
 
     // Capture initial values at the first session sample
     if (!session.sessionTrafficBase) {
-      session.sessionTrafficBase = { rx: sample.rxBytes, tx: sample.txBytes };
+      const activeProfile = session.lastActiveProfile ?? "";
+
+      // Tenter de restaurer la base depuis localStorage si elle correspond
+      // au profil actuellement connecté (survie à un redémarrage de la GUI)
+      const persisted = getSessionTrafficBase();
+      if (
+        persisted !== null &&
+        activeProfile.trim() !== "" &&
+        persisted.profilePath === activeProfile.trim() &&
+        persisted.rx <= sample.rxBytes &&
+        persisted.tx <= sample.txBytes
+      ) {
+        // Base cohérente : on la réutilise pour préserver les totaux de session
+        session.sessionTrafficBase = { rx: persisted.rx, tx: persisted.tx };
+      } else {
+        // Première connexion ou base invalide : on initialise et on persiste
+        session.sessionTrafficBase = { rx: sample.rxBytes, tx: sample.txBytes };
+        if (activeProfile.trim() !== "") {
+          setSessionTrafficBase({
+            profilePath: activeProfile.trim(),
+            rx: sample.rxBytes,
+            tx: sample.txBytes,
+          });
+        }
+      }
     }
 
     const now = Date.now() / 1000;
