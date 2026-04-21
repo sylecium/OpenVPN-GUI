@@ -21,7 +21,7 @@ OpenVPN GUI is a modern desktop application built with **Tauri 2** (TypeScript f
 
 The application is split into three main components to ensure privilege separation and security.
 
-```
+```ansi
 ┌─────────────┐   Tauri IPC    ┌──────────────┐   Unix socket    ┌────────────────────┐
 │  Frontend   │ <────────────> │ Tauri Core   │ <──────────────> │ openvpn-gui-daemon │
 │  (React/TS) │    invoke()    │   (Rust)     │   JSON / Unix    │  (System Service)  │
@@ -43,7 +43,7 @@ The `openvpn-gui-daemon` uses `SO_PEERCRED` to verify the identity of the connec
 
 ## Prerequisites
 
-- **OpenVPN** (system package)
+- **OpenVPN v2.x** (v3 is not currently supported)
 - **Rust** toolchain (for building from source)
 - **Node.js** and **npm** (for frontend development)
 - **Systemd**-based Linux distribution
