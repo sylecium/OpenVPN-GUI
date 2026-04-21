@@ -14,7 +14,7 @@ use vpn_ipc::send_command;
 struct RecentProfile {
     path: String,
     last_used_unix_ms: u64,
-    /// Libellé affiché dans l'application uniquement (le chemin fichier reste inchangé).
+    /// Display label in the application only (file path remains unchanged).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     display_name: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -133,15 +133,15 @@ fn vpn_iface_traffic() -> Result<VpnIfaceTraffic, String> {
     parse_tun_tap_traffic()
 }
 
-/// Première directive `remote` du profil (host:port ; port 1194 si omis, comme OpenVPN par défaut).
+/// First `remote` directive of the profile (host:port ; port 1194 if omitted, like OpenVPN default).
 #[tauri::command]
 fn ovpn_remote_hint(profile_path: String) -> Result<String, String> {
     let path = profile_path.trim();
     if path.is_empty() {
-        return Err("chemin vide".to_string());
+        return Err("empty path".to_string());
     }
-    let raw = fs::read_to_string(path).map_err(|e| format!("lecture du profil impossible : {e}"))?;
-    parse_ovpn_remote_display(&raw).ok_or_else(|| "aucune directive remote dans le fichier".to_string())
+    let raw = fs::read_to_string(path).map_err(|e| format!("cannot read profile: {e}"))?;
+    parse_ovpn_remote_display(&raw).ok_or_else(|| "no remote directive in file".to_string())
 }
 
 #[cfg(test)]
@@ -204,24 +204,24 @@ fn reorder_recent_profiles(ordered_paths: Vec<String>) -> Result<(), String> {
     let path = recent_profiles_path();
     let current = read_json_file::<Vec<RecentProfile>>(&path)?;
     if ordered_paths.len() != current.len() {
-        return Err("réordonnancement invalide : nombre de profils incohérent".to_string());
+        return Err("invalid reordering: inconsistent number of profiles".to_string());
     }
     let mut map: HashMap<String, RecentProfile> = current
         .into_iter()
         .map(|entry| (entry.path.clone(), entry))
         .collect();
     if map.len() != ordered_paths.len() {
-        return Err("réordonnancement invalide : doublons dans la liste enregistrée".to_string());
+        return Err("invalid reordering: duplicates in saved list".to_string());
     }
     let mut reordered = Vec::with_capacity(ordered_paths.len());
     for path_entry in ordered_paths {
         let Some(entry) = map.remove(&path_entry) else {
-            return Err(format!("réordonnancement invalide : profil inconnu ({path_entry})"));
+            return Err(format!("invalid reordering: unknown profile ({path_entry})"));
         };
         reordered.push(entry);
     }
     if !map.is_empty() {
-        return Err("réordonnancement invalide : ordre incomplet".to_string());
+        return Err("invalid reordering: incomplete order".to_string());
     }
     write_json_file(&path, &reordered)
 }
@@ -288,7 +288,7 @@ fn set_profile_metadata(
     let path = recent_profiles_path();
     let mut current = read_json_file::<Vec<RecentProfile>>(&path)?;
     let Some(entry) = current.iter_mut().find(|item| item.path == profile_path) else {
-        return Err("profil absent de la liste récente".to_string());
+        return Err("profile not in recent list".to_string());
     };
     entry.display_name = normalized_display;
     entry.group = normalized_group;
@@ -300,7 +300,7 @@ fn rename_profile_file(old_path: String, new_path: String) -> Result<String, Str
     let old_path = old_path.trim().to_string();
     let new_path = new_path.trim().to_string();
     if old_path.is_empty() || new_path.is_empty() {
-        return Err("chemins invalides".to_string());
+        return Err("invalid paths".to_string());
     }
     if old_path == new_path {
         return Ok(new_path);
@@ -309,27 +309,27 @@ fn rename_profile_file(old_path: String, new_path: String) -> Result<String, Str
     let path = recent_profiles_path();
     let mut current = read_json_file::<Vec<RecentProfile>>(&path)?;
     if !current.iter().any(|item| item.path == old_path) {
-        return Err("profil absent de la liste récente".to_string());
+        return Err("profile not in recent list".to_string());
     }
 
     let old = Path::new(&old_path);
     let new = Path::new(&new_path);
     if !old.is_file() {
-        return Err("fichier source introuvable ou non accessible".to_string());
+        return Err("source file not found or not accessible".to_string());
     }
     if new.exists() {
-        return Err("un fichier existe déjà à cette destination".to_string());
+        return Err("a file already exists at this destination".to_string());
     }
     if let Some(parent) = new.parent() {
         if !parent.as_os_str().is_empty() {
             fs::create_dir_all(parent)
-                .map_err(|e| format!("impossible de créer le dossier cible : {e}"))?;
+                .map_err(|e| format!("cannot create target folder: {e}"))?;
         }
     }
-    fs::rename(old, new).map_err(|e| format!("impossible de renommer le fichier : {e}"))?;
+    fs::rename(old, new).map_err(|e| format!("cannot rename file: {e}"))?;
 
     let Some(entry) = current.iter_mut().find(|item| item.path == old_path) else {
-        return Err("incohérence liste récente après renommage".to_string());
+        return Err("recent list inconsistency after rename".to_string());
     };
     entry.path = new_path.clone();
     write_json_file(&path, &current)?;

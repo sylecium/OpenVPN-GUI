@@ -45,7 +45,7 @@ function bindVpnListDelegation(): void {
       return;
     }
     if (target.closest(".vpn-item--demo")) {
-      setFeedback("Exemple visuel uniquement : importez un fichier .ovpn réel.", true);
+      setFeedback("Visual example only: import a real .ovpn file.", true);
     }
   });
 }

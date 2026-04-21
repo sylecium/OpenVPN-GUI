@@ -5,6 +5,7 @@ import { basename } from "../lib/format";
 import { byId } from "../lib/dom";
 import { refreshRecentProfiles } from "../sync/profiles";
 import { setFeedback } from "./feedback";
+import { t } from "../i18n";
 
 let onDocumentKeydown: ((event: KeyboardEvent) => void) | null = null;
 
@@ -31,7 +32,7 @@ export function openProfileEditModal(profilePath: string, customDisplay: string,
   pathInput.value = profilePath;
 
   const hint = byId<HTMLElement>("profile-edit-basename-hint");
-  hint.textContent = profilePath ? `Nom de fichier : ${basename(profilePath)}` : "";
+  hint.textContent = profilePath ? `File name: ${basename(profilePath)}` : "";
 
   root.classList.remove("hidden");
   root.setAttribute("aria-hidden", "false");
@@ -60,7 +61,7 @@ async function saveProfileEdits(originalPath: string): Promise<void> {
   const groupTrim = groupInput.value.trim();
 
   if (!newPath) {
-    setFeedback("Le chemin du fichier ne peut pas être vide.", true);
+    setFeedback("File path cannot be empty.", true);
     return;
   }
 
@@ -78,7 +79,7 @@ async function saveProfileEdits(originalPath: string): Promise<void> {
     );
 
     byId<HTMLInputElement>("profile-path").value = pathAfter;
-    setFeedback("Profil mis à jour");
+    setFeedback(t("feedback.saved"));
     closeModal();
     await refreshRecentProfiles();
   } catch (error) {
@@ -100,7 +101,7 @@ export function bindProfileEditModal(): void {
 
   pathInput.addEventListener("input", () => {
     const p = pathInput.value.trim();
-    hint.textContent = p ? `Nom de fichier : ${basename(p)}` : "";
+    hint.textContent = p ? `File name: ${basename(p)}` : "";
   });
 
   backdrop.addEventListener("click", () => {
@@ -126,7 +127,7 @@ export function bindProfileEditModal(): void {
   openEditor.addEventListener("click", () => {
     const target = pathInput.value.trim();
     if (!target) {
-      setFeedback("Aucun chemin à ouvrir.", true);
+      setFeedback("No path to open.", true);
       return;
     }
     void openPath(target).catch((error: unknown) => {

@@ -25,7 +25,7 @@ function shouldPreferLogsRemote(vpnStatus: VpnStatus, profilePath: string): bool
   );
 }
 
-/** Met à jour la carte REMOTE selon la sélection, l’état VPN et le cache journaux / fichier .ovpn. */
+/** Updates the REMOTE card based on selection, VPN state, and logs/.ovpn cache. */
 export function refreshStatRemoteDisplay(): void {
   const path = selectedProfilePath();
   const st = session.lastKnownStatus;
@@ -73,7 +73,7 @@ export function updateServerMetaForFilename(filename: string): void {
   byId<HTMLElement>("stat-cipher").textContent = "AES-256-GCM";
 }
 
-/** Met à jour protocol/cipher et lance le chargement du remote depuis le fichier .ovpn. */
+/** Updates protocol/cipher and starts loading remote from .ovpn file. */
 export function refreshServerMetaForProfile(profilePath: string): void {
   if (!profilePath.trim()) {
     resetServerMetaEmpty();
@@ -90,7 +90,7 @@ export function resetServerMetaEmpty(): void {
   byId<HTMLElement>("stat-remote").textContent = "—";
 }
 
-/** Après rafraîchissement du statut démon : invalide le remote issu des journaux si plus de session connectée. */
+/** After daemon status refresh: invalidates log-based remote if no longer connected. */
 export function applySessionRemoteFromStatus(vpnStatus: VpnStatus, _activeProfile: string | undefined | null): void {
   if (vpnStatus !== "connected") {
     session.lastRemoteFromLogs = null;

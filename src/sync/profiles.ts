@@ -6,6 +6,7 @@ import { setFeedback } from "../ui/feedback";
 import { refreshServerMetaForProfile, resetServerMetaEmpty } from "../ui/server-meta-view";
 import { createVpnSidebarRow } from "../ui/ovpn-row";
 import { syncVpnListRowStatusTexts, syncProfileStatusIndicator } from "./status";
+import { t } from "../i18n";
 
 let vpnListDragAbort: AbortController | null = null;
 
@@ -45,7 +46,7 @@ function getDragAfterElement(list: HTMLElement, y: number): HTMLLIElement | null
   return closest.element;
 }
 
-/** Réordonnancement par glisser-déposer (profils enregistrés uniquement). */
+/** Drag and drop reordering (saved profiles only). */
 function initVpnListDragDrop(): void {
   const list = byId<HTMLElement>("vpn-list");
   vpnListDragAbort?.abort();
@@ -219,7 +220,7 @@ export function fillServerSelect(recent: RecentProfile[]): void {
 
   const placeholder = document.createElement("option");
   placeholder.value = "";
-  placeholder.textContent = "Choisir un profil .ovpn";
+  placeholder.textContent = t("select.profile.placeholder");
   select.append(placeholder);
 
   for (const profile of recent) {

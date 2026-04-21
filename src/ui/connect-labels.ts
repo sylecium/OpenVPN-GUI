@@ -1,6 +1,7 @@
 import type { VpnStatus } from "../types/ipc";
 import { assertNever } from "../lib/assert";
 import { byId } from "../lib/dom";
+import { t } from "../i18n";
 
 export function updateConnectLabels(status: VpnStatus): void {
   const sub = byId<HTMLElement>("connect-sub");
@@ -10,24 +11,24 @@ export function updateConnectLabels(status: VpnStatus): void {
 
   switch (status) {
     case "idle":
-      txt.textContent = "Connecter";
-      sub.textContent = "Prêt à établir une session.";
+      txt.textContent = t("btn.connect");
+      sub.textContent = "Ready to establish a session.";
       btn.setAttribute("aria-pressed", "false");
       break;
     case "connecting":
-      txt.textContent = "Connexion…";
-      sub.textContent = "Négociation avec le serveur…";
+      txt.textContent = t("status.connecting");
+      sub.textContent = "Negotiating with the server...";
       btn.setAttribute("aria-pressed", "false");
       break;
     case "connected":
-      txt.textContent = "Déconnecter";
-      sub.textContent = "Session VPN active.";
+      txt.textContent = t("btn.disconnect");
+      sub.textContent = "Active VPN session.";
       btn.classList.add("connected");
       btn.setAttribute("aria-pressed", "true");
       break;
     case "error":
-      txt.textContent = "Connecter";
-      sub.textContent = "Vérifiez le profil ou les journaux.";
+      txt.textContent = t("btn.connect");
+      sub.textContent = "Check profile or logs.";
       btn.setAttribute("aria-pressed", "false");
       break;
     default:

@@ -123,9 +123,9 @@ fn ensure_socket_dir(socket_path: &str) -> Result<(), String> {
     if !parent.exists() {
         fs::create_dir_all(parent).map_err(|error| format!("cannot create socket dir: {error}"))?;
     }
-    // Répertoire traversable par tout le monde; le contrôle d'accès se fait via SO_PEERCRED
-    // (allowed_uid). Sans cela, un répertoire préexistant en 0750 (ou umask agressif) provoque
-    // EACCES à la connexion pour l'utilisateur du bureau.
+    // Directory traversable by everyone; access control is done via SO_PEERCRED
+    // (allowed_uid). Without this, a pre-existing 0750 directory (or aggressive umask) causes
+    // EACCES upon connection for the desktop user.
     fs::set_permissions(parent, fs::Permissions::from_mode(0o755))
         .map_err(|error| format!("cannot set socket directory permissions: {error}"))?;
     Ok(())
@@ -451,7 +451,7 @@ fn watch_child(
     child_slot: Arc<Mutex<Option<Arc<Mutex<Child>>>>>,
     child_ref: Arc<Mutex<Child>>,
 ) {
-    // Ne jamais garder le mutex pendant `wait()` : sinon `disconnect` reste bloqué sur `kill()`.
+    // Never keep the mutex during `wait()`: otherwise `disconnect` gets stuck on `kill()`.
     let exit_result = loop {
         let polled = {
             let mut child = match child_ref.lock() {

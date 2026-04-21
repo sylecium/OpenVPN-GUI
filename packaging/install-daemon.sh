@@ -38,13 +38,13 @@ detect_cargo_for_user() {
 }
 
 if ! OPENVPN_BIN="$(find_openvpn)"; then
-  echo "Erreur: openvpn est introuvable. Installe OpenVPN (paquet 'openvpn') avant de continuer."
+  echo "Error: openvpn not found. Install OpenVPN ('openvpn' package) before continuing."
   exit 1
 fi
 
 if ! CARGO_BIN="$(detect_cargo_for_user)"; then
-  echo "Erreur: cargo est introuvable pour l'utilisateur '${TARGET_USER}'."
-  echo "Conseil: lance sans sudo: npm run daemon:install"
+  echo "Error: cargo not found for user '${TARGET_USER}'."
+  echo "Hint: run without sudo: npm run daemon:install"
   exit 1
 fi
 
@@ -71,9 +71,9 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now "${SERVICE_NAME}"
 sudo systemctl restart "${SERVICE_NAME}"
 
-echo "Daemon installé et actif."
+echo "Daemon installed and active."
 echo "Service: ${SERVICE_NAME}"
-echo "Utilisateur autorisé (UID): ${TARGET_UID} (${TARGET_USER})"
+echo "Authorized user (UID): ${TARGET_UID} (${TARGET_USER})"
 echo "Config: ${CONFIG_PATH}"
-echo "openvpn détecté: ${OPENVPN_BIN}"
-echo "cargo détecté: ${CARGO_BIN}"
+echo "detected openvpn: ${OPENVPN_BIN}"
+echo "detected cargo: ${CARGO_BIN}"

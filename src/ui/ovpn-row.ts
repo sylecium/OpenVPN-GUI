@@ -1,4 +1,5 @@
 import { profileDisplayLabel } from "../lib/format";
+import { t } from "../i18n";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -68,7 +69,7 @@ export function createVpnSidebarRow(profile: {
   } else {
     li.dataset.path = profile.path;
     li.draggable = true;
-    li.title = "Glisser-déposer pour réordonner les profils";
+    li.title = "Drag and drop to reorder profiles";
   }
 
   const left = document.createElement("div");
@@ -82,7 +83,7 @@ export function createVpnSidebarRow(profile: {
   name.textContent = profileDisplayLabel(profile.path, profile.displayName);
   const statusText = document.createElement("span");
   statusText.className = "vpn-status-text";
-  statusText.textContent = profile.isDemo ? "Exemple" : "Hors ligne";
+  statusText.textContent = profile.isDemo ? "Example" : t("status.idle");
   info.append(name, statusText);
   left.append(info);
 
@@ -94,11 +95,11 @@ export function createVpnSidebarRow(profile: {
   editBtn.draggable = false;
   editBtn.className = "row-action row-action--edit";
   editBtn.dataset.ovpnAction = "edit";
-  editBtn.setAttribute("aria-label", "Modifier le profil (nom affiché, chemin)");
+  editBtn.setAttribute("aria-label", "Edit profile (display name, path)");
   editBtn.append(pencilIcon());
   if (profile.isDemo) {
     editBtn.disabled = true;
-    editBtn.title = "Exemple non enregistré";
+    editBtn.title = "Unsaved example";
   } else {
     editBtn.dataset.path = profile.path;
     const custom = profile.displayName?.trim();
@@ -116,11 +117,11 @@ export function createVpnSidebarRow(profile: {
   delBtn.draggable = false;
   delBtn.className = "row-action row-action--remove";
   delBtn.dataset.ovpnAction = "remove";
-  delBtn.setAttribute("aria-label", "Retirer de la liste");
+  delBtn.setAttribute("aria-label", "Remove from list");
   delBtn.append(trashIcon());
   if (profile.isDemo) {
     delBtn.disabled = true;
-    delBtn.title = "Exemple non enregistré";
+    delBtn.title = "Unsaved example";
   } else {
     delBtn.dataset.path = profile.path;
   }

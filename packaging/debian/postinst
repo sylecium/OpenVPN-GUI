@@ -1,11 +1,11 @@
 #!/bin/sh
 set -e
 
-# Détecter l'utilisateur physique ayant lancé l'installation
+# Detect the physical user who ran the installation
 if [ -n "$SUDO_USER" ] && [ "$SUDO_USER" != "root" ]; then
     TARGET_USER="$SUDO_USER"
 else
-    # Fallback pour les installateurs graphiques (GNOME Software, Discover, etc.)
+    # Fallback for graphical installers (GNOME Software, Discover, etc.)
     TARGET_USER=$(awk -F':' '{ if ($3 >= 1000 && $3 <= 60000) print $1 }' /etc/passwd | head -n1)
 fi
 
@@ -15,7 +15,7 @@ fi
 
 TARGET_UID=$(id -u "$TARGET_USER")
 
-# Trouver le binaire openvpn (peut varier selon les distros)
+# Find openvpn binary (may vary depending on distro)
 OPENVPN_BIN="/usr/sbin/openvpn"
 if ! command -v openvpn >/dev/null 2>&1; then
     if [ -x "/usr/bin/openvpn" ]; then
@@ -23,7 +23,7 @@ if ! command -v openvpn >/dev/null 2>&1; then
     fi
 fi
 
-# Configurer le démon pour l'utilisateur principal
+# Configure daemon for the primary user
 mkdir -p /etc/openvpn-gui
 
 cat > /etc/openvpn-gui/daemon.toml <<EOF
@@ -36,7 +36,7 @@ EOF
 
 chmod 644 /etc/openvpn-gui/daemon.toml
 
-# Recharger systemd et activer le service
+# Reload systemd and enable service
 systemctl daemon-reload || true
 systemctl enable --now openvpn-gui-daemon.service || true
 

@@ -4,6 +4,7 @@ import { byId } from "../lib/dom";
 import { session } from "../state/session";
 import { setFeedback } from "../ui/feedback";
 import { updateConnectLabels } from "../ui/connect-labels";
+import { t } from "../i18n";
 import {
   applySessionRemoteFromStatus,
   refreshStatRemoteDisplay,
@@ -29,11 +30,11 @@ export function syncVpnListRowStatusTexts(): void {
     }
     const activeMatch = active != null && sameProfilePath(active, path);
     if (st === "connected" && activeMatch) {
-      sub.textContent = "Connecté";
+      sub.textContent = t("status.connected");
     } else if (st === "connecting" && sameProfilePath(selected, path)) {
-      sub.textContent = "Connexion…";
+      sub.textContent = t("status.connecting");
     } else {
-      sub.textContent = "Hors ligne";
+      sub.textContent = t("status.idle");
     }
   }
 }
@@ -68,7 +69,7 @@ export async function refreshStatus(): Promise<void> {
     syncProfileStatusIndicator();
 
     byId<HTMLElement>("status-label").textContent = mapStatusLabel(status.status);
-    byId<HTMLElement>("active-profile").textContent = `Profil actif (démon) : ${status.activeProfile ?? "aucun"}`;
+    byId<HTMLElement>("active-profile").textContent = `Active profile (daemon): ${status.activeProfile ?? "none"}`;
 
     updateConnectLabels(status.status);
     syncVpnListRowStatusTexts();

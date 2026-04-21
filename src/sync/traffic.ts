@@ -2,6 +2,7 @@ import * as backend from "../api/backend";
 import { formatBitrate, formatBytes } from "../lib/format";
 import { byId } from "../lib/dom";
 import { session } from "../state/session";
+import { t } from "../i18n";
 
 export async function refreshTrafficStats(): Promise<void> {
   const downEl = byId<HTMLElement>("stat-down");
@@ -13,7 +14,7 @@ export async function refreshTrafficStats(): Promise<void> {
   const clearUI = () => {
     downEl.textContent = "—";
     upEl.textContent = "—";
-    ifaceEl.textContent = "Interface : —";
+    ifaceEl.textContent = `${t("stats.interface")}: —`;
     totalDownEl.textContent = "—";
     totalUpEl.textContent = "—";
   };
@@ -28,7 +29,7 @@ export async function refreshTrafficStats(): Promise<void> {
   try {
     const sample = await backend.apiVpnIfaceTraffic();
 
-    // Capture des valeurs initiales au premier échantillon de la session
+    // Capture initial values at the first session sample
     if (!session.sessionTrafficBase) {
       session.sessionTrafficBase = { rx: sample.rxBytes, tx: sample.txBytes };
     }
@@ -39,7 +40,7 @@ export async function refreshTrafficStats(): Promise<void> {
     let currentDtx = 0;
     let validRate = false;
 
-    // Calcul du débit instantané
+    // Calculate instant bitrate
     if (session.lastTrafficSample) {
       const dt = now - session.lastTrafficSample.t;
       if (dt > 0.05) {
@@ -63,7 +64,7 @@ export async function refreshTrafficStats(): Promise<void> {
     }
 
     ifaceEl.textContent =
-      sample.iface === "—" ? "Interface : aucune (tun/tap)" : `Interface : ${sample.iface}`;
+      sample.iface === "—" ? `${t("stats.interface")}: ${t("stats.interface.none")}` : `${t("stats.interface")}: ${sample.iface}`;
 
     if (validRate) {
       downEl.textContent = formatBitrate(currentDrx);
@@ -73,7 +74,7 @@ export async function refreshTrafficStats(): Promise<void> {
       upEl.textContent = "—";
     }
 
-    // Calcul et affichage du total de session
+    // Calculate and display session total
     const sessionRx = sample.rxBytes - session.sessionTrafficBase.rx;
     const sessionTx = sample.txBytes - session.sessionTrafficBase.tx;
     totalDownEl.textContent = formatBytes(sessionRx < 0 ? 0 : sessionRx);
