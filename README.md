@@ -1,108 +1,131 @@
 # OpenVPN GUI
 
-Desktop application built with **Tauri 2** (TypeScript frontend, Rust backend). On Linux it talks to a separate **`openvpn-gui-daemon`** service over a Unix socket so the GUI does not need to run OpenVPN as your user with elevated privileges for process control.
+[![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](https://opensource.org/licenses/MIT)
+[![Rust](https://img.shields.io/badge/Rust-1.75+-black?logo=rust)](https://www.rust-lang.org/)
+[![Node](https://img.shields.io/badge/Node-LTS-black?logo=node.js)](https://nodejs.org/)
+[![Tauri](https://img.shields.io/badge/Tauri-2.0-black?logo=tauri)](https://tauri.app/)
 
-## What the app does today
+OpenVPN GUI is a modern desktop application built with **Tauri 2** (TypeScript frontend, Rust backend). On Linux, it communicates with a separate **`openvpn-gui-daemon`** service over a **Unix socket**. This architecture ensures that the GUI does not require elevated privileges to manage OpenVPN processes.
 
-- **Connect / disconnect** using an `.ovpn` profile path; the daemon spawns the system **`openvpn`** binary and tracks process state.
-- **Connection status** (idle, connecting, connected, error) and **active profile** reported from the daemon, synced into the UI.
-- **Live OpenVPN logs** streamed from the daemon (stdout/stderr), with copy, clear view, and refresh actions.
-- **Recent profiles** list with import, remove from recents, optional **display name**, **folder grouping** with collapsible folders, advanced **drag-and-drop reorganization**, and **rename profile file** (updates recents accordingly).
-- **Session history** (connect/disconnect events and messages) stored locally; clear history action.
-- **Traffic indicators** (Linux): reads **`/proc/net/dev`** for the first matching **tun/tap** interface and exposes RX/TX byte counters to the UI for **instant bitrate** and **per-session totals** (delta since connect). Stats are accurately scoped to only display on the currently active profile.
-- **Tunnel interface name** shown in the UI while connected.
-- **Light / dark theme** toggle.
-- **Responsive layout** so the shell scales on wide and narrow windows.
+## Key Features
 
-### Limitations you should know
+- **Secure Profile Management**: Import and manage `.ovpn` profiles with custom display names and folder-based grouping.
+- **Advanced Organization**: Support for **drag-and-drop** reordering of profiles and groups.
+- **Real-time Monitoring**: Live OpenVPN log streaming with integrated terminal controls.
+- **Traffic Statistics**: Instant bitrate and session-total data (download/upload) captured via `/proc/net/dev` for `tun`/`tap` interfaces.
+- **Persistence**: Remembers group collapse states and session traffic totals across application restarts.
+- **Session History**: Persistent event log tracking connection attempts and status changes.
+- **Modern UI**: Responsive design with high-contrast **light** and **dark** modes.
 
-- **Daemon and install script are aimed at Linux** (systemd, `/usr/sbin`, `/etc/openvpn-gui`, `/run/openvpn-gui`). The GUI may build on other platforms, but VPN control and traffic stats follow the Linux daemon and `/proc/net/dev` logic.
-- **Traffic stats** are unavailable (zeros) when not on Linux or when no tun/tap row is found; if several tunnels exist, the chosen interface follows the daemon’s selection order (tun preferred over tap, then name order).
-- **Protocol / cipher** cards in the dashboard use heuristic values from the profile filename where applicable. The **remote** directive is parsed from the actual `.ovpn` file or resolved from the OpenVPN logs.
+## Architecture
 
-## Architecture (short)
+The application is split into three main components to ensure privilege separation and security.
 
 ```
-┌─────────────┐   Tauri IPC    ┌──────────────┐   Unix socket    ┌──────────────────┐
-│  Web UI     │ ◄────────────► │ openvpn-gui  │ ◄──────────────► │ openvpn-gui-     │
-│  (Vite/TS)  │   invoke()     │   (Rust)     │   JSON messages  │ daemon (Rust)    │
-└─────────────┘                └──────────────┘                  └────────┬─────────┘
+┌─────────────┐   Tauri IPC    ┌──────────────┐   Unix socket    ┌────────────────────┐
+│  Frontend   │ <────────────> │ Tauri Core   │ <──────────────> │ openvpn-gui-daemon │
+│  (React/TS) │    invoke()    │   (Rust)     │   JSON / Unix    │  (System Service)  │
+└─────────────┘                └──────────────┘                  └─────────┬──────────┘
                                                                            │ spawns
-                                                                           ▼
-                                                                   ┌───────────────┐
-                                                                   │ openvpn (OS) │
-                                                                   └───────────────┘
+                                                                           v
+                                                                   ┌──────────────────┐
+                                                                   │  openvpn binary  │
+                                                                   └──────────────────┘
 ```
 
-Shared types live in the **`openvpn-ipc`** workspace crate.
+1. **Frontend**: A lightweight TypeScript interface running inside the Tauri WebView.
+2. **Tauri Core**: Orchestrates the UI window and acts as a bridge for the Unix socket communication.
+3. **System Daemon**: A dedicated Rust service that manages OpenVPN processes and requires administrative rights for network configuration.
+
+## Security Model
+
+The `openvpn-gui-daemon` uses `SO_PEERCRED` to verify the identity of the connecting user. Only the user specified in the configuration (`allowed_uid`) can control the VPN. The systemd unit is hardened with `ProtectHome=read-only` to allow access to configuration files while protecting user data.
 
 ## Prerequisites
 
-- **Node.js** and **npm** for the frontend and Tauri CLI.
-- **Rust** toolchain (`cargo`, `rustc`).
-- **`openvpn`** installed and on `PATH` where the daemon runs.
-- On Linux for full operation: **installed and running `openvpn-gui-daemon`** (see below).
+- **OpenVPN** (system package)
+- **Rust** toolchain (for building from source)
+- **Node.js** and **npm** (for frontend development)
+- **Systemd**-based Linux distribution
 
-## Development
+## Installation
 
+The recommended way to install OpenVPN GUI is using the pre-built packages available on the [GitHub Releases](https://github.com/sylecium/OpenVPN-GUI/releases) page.
+
+### 1. Using Pre-built Packages
+
+#### Debian / Ubuntu (`.deb`)
+Download the `.deb` package and install it using `apt` (which handles dependencies automatically):
+```bash
+sudo apt update
+sudo apt install ./openvpn-gui_0.1.0_amd64.deb
+```
+
+#### Fedora / RHEL / CentOS (`.rpm`)
+Download the `.rpm` package and install it using `dnf`:
+```bash
+sudo dnf install ./openvpn-gui-0.1.0-1.x86_64.rpm
+```
+
+> **Note**: The packages automatically handle the installation of the `openvpn-gui-daemon` binary, the systemd service configuration, and the initial setup of the communication socket.
+
+### 2. Building from Source (Advanced)
+
+If you prefer to build the application manually, follow these steps:
+
+#### Building the GUI Package
 ```bash
 npm install
-npm run tauri dev
+npm run build:deb # Produces a .deb package in src-tauri/target/release/bundle/deb
 ```
 
-Build the desktop bundle:
-
-```bash
-npm run tauri build
-```
-
-### Packaging (.deb / .rpm)
-
-Tauri can automatically generate `.deb` and `.rpm` installers for Linux. Because `tauri.conf.json` is set to bundle `"all"` targets, simply running the build command above will create the packages in `src-tauri/target/release/bundle/`.
-
-> **Important**: The generated `.deb` and `.rpm` packages currently only include the **GUI frontend** (`openvpn-gui`). Because the `openvpn-gui-daemon` requires systemd integration and dynamically binds to the installing user's UID (for security), you must still run `npm run daemon:install` after installing the `.deb` or `.rpm` to properly configure the backend service.
-
-## Installing the daemon (Linux)
-
-From the repository root (the script will use `sudo` only where needed):
-
+#### Installing the Daemon Manually
+If you are not using the `.deb` or `.rpm` packages, you must install the backend service manually:
 ```bash
 npm run daemon:install
 ```
 
-Run **without** prepending `sudo` yourself; the installer invokes `sudo` for system paths.
+This script will:
+- Compile the `openvpn-daemon` in release mode.
+- Install the binary to `/usr/sbin/openvpn-gui-daemon`.
+- Configure `/etc/openvpn-gui/daemon.toml` with your current **UID**.
+- Setup and start the **systemd** service.
 
-The script typically:
-
-- Builds **`openvpn-daemon`** in release mode.
-- Installs the binary to `/usr/sbin/openvpn-gui-daemon`.
-- Writes `/etc/openvpn-gui/daemon.toml` with the invoking user’s UID (`allowed_uid` for `SO_PEERCRED` checks).
-- Installs or updates **`openvpn-gui-daemon.service`**, enables and restarts it.
-
-Check service status:
-
+To check the service status:
 ```bash
 npm run daemon:status
 ```
 
-To cleanly uninstall the daemon, stop the service, and remove its files:
+## Development
+
+To start the application in development mode with hot-reload:
 
 ```bash
-npm run daemon:uninstall
+npm run tauri dev
 ```
 
-## “Permission denied” on the control socket
+## Release Workflow
 
-If the daemon still uses a root-only socket (`0660`) or `/run/openvpn-gui` is not world-traversable (`0750`), the desktop user cannot open the socket. Rebuild and reinstall the daemon, then restart the service:
+This project uses **Conventional Commits** and **GitHub Actions** for automated releases.
 
-```bash
-npm run daemon:install
-```
+To prepare a new release:
+1. Run `npm run release -- <patch|minor|major>` to bump versions and create a tag.
+2. Run `git push origin main --tags` to trigger the CI.
 
-Quick check:
+The GitHub Action will automatically:
+- Build the application and the daemon.
+- Package the `.deb` and `.rpm` installers.
+- Create a **GitHub Release** with auto-generated change logs.
 
+## Troubleshooting
+
+### Socket Access Issues
+If the GUI cannot connect to the daemon, verify the permissions of the communication socket:
 ```bash
 ls -la /run/openvpn-gui/
 ```
+The directory should be traversable (`0755`) and the socket writable. Access is enforced by the daemon via **UID verification**.
 
-You should see a directory others can traverse (`drwxr-xr-x`) and a socket writable by all (`srw-rw-rw-`). Actual access is still restricted to the UID configured in `/etc/openvpn-gui/daemon.toml` via **`SO_PEERCRED`**.
+## License
+
+This project is licensed under the **MIT License**.
