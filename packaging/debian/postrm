@@ -1,10 +1,16 @@
 #!/bin/sh
 set -e
 
-if [ "$1" = "purge" ]; then
-    rm -rf /etc/openvpn-gui
+# Called after the package files have been removed.
+# Reload systemd to drop the now-removed service unit.
+if command -v systemctl > /dev/null 2>&1; then
+    systemctl daemon-reload || true
+    systemctl reset-failed openvpn-gui-daemon.service 2>/dev/null || true
 fi
 
-systemctl daemon-reload || true
+# On purge: ensure configuration directory is gone (belt-and-suspenders).
+if [ "$1" = "purge" ]; then
+    rm -rf /etc/openvpn-gui || true
+fi
 
 exit 0

@@ -1,8 +1,23 @@
 #!/bin/sh
 set -e
 
+# Called before the package files are removed.
+# On "remove" or "deconfigure": stop and disable the daemon service cleanly.
 if [ "$1" = "remove" ] || [ "$1" = "deconfigure" ]; then
-    systemctl disable --now openvpn-gui-daemon.service || true
+    # Stop the service if it is running
+    if command -v systemctl > /dev/null 2>&1; then
+        systemctl stop openvpn-gui-daemon.service || true
+        systemctl disable openvpn-gui-daemon.service || true
+    fi
+
+    # Remove the daemon binary installed outside of dpkg tracking
+    rm -f /usr/sbin/openvpn-gui-daemon || true
+
+    # Remove the runtime socket directory if it still exists
+    rm -rf /run/openvpn-gui || true
+
+    # Remove the daemon configuration directory
+    rm -rf /etc/openvpn-gui || true
 fi
 
 exit 0

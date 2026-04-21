@@ -85,6 +85,12 @@ Check service status:
 npm run daemon:status
 ```
 
+To cleanly uninstall the daemon, stop the service, and remove its files:
+
+```bash
+npm run daemon:uninstall
+```
+
 ## “Permission denied” on the control socket
 
 If the daemon still uses a root-only socket (`0660`) or `/run/openvpn-gui` is not world-traversable (`0750`), the desktop user cannot open the socket. Rebuild and reinstall the daemon, then restart the service:
