@@ -36,7 +36,9 @@
     ],
     "linux": {
       "deb": {
-        "depends": ["openvpn"],
+        "depends": [
+          "openvpn"
+        ],
         "files": {
           "/usr/sbin/openvpn-gui-daemon": "target/release/openvpn-daemon",
           "/etc/systemd/system/openvpn-gui-daemon.service": "../systemd/openvpn-gui-daemon.service"
