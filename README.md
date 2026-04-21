@@ -7,6 +7,8 @@
 
 OpenVPN GUI is a modern desktop application built with **Tauri 2** (TypeScript frontend, Rust backend). On Linux, it communicates with a separate **`openvpn-gui-daemon`** service over a **Unix socket**. This architecture ensures that the GUI does not require elevated privileges to manage OpenVPN processes.
 
+![OpenVPN GUI Interface](openvpn-gui-v.0.1.0.png)
+
 ## Key Features
 
 - **Secure Profile Management**: Import and manage `.ovpn` profiles with custom display names and folder-based grouping.

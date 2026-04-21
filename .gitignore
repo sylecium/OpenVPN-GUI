@@ -27,3 +27,4 @@ dist-ssr
 .omc
 .vscode
 .husky
+mock-screenshot.html
