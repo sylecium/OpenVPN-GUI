@@ -11,6 +11,7 @@
     "tauri": "tauri",
     "daemon:install": "bash ./packaging/install-daemon.sh",
     "daemon:status": "sudo systemctl status openvpn-gui-daemon.service --no-pager",
+    "build:deb": "bash ./packaging/build-deb.sh",
     "prepare": "husky"
   },
   "dependencies": {

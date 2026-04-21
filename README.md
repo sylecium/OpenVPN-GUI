@@ -7,9 +7,9 @@ Desktop application built with **Tauri 2** (TypeScript frontend, Rust backend). 
 - **Connect / disconnect** using an `.ovpn` profile path; the daemon spawns the system **`openvpn`** binary and tracks process state.
 - **Connection status** (idle, connecting, connected, error) and **active profile** reported from the daemon, synced into the UI.
 - **Live OpenVPN logs** streamed from the daemon (stdout/stderr), with copy, clear view, and refresh actions.
-- **Recent profiles** list with import, remove from recents, optional **display name** (UI only), and **rename profile file** (updates recents accordingly).
+- **Recent profiles** list with import, remove from recents, optional **display name**, **folder grouping** with collapsible folders, advanced **drag-and-drop reorganization**, and **rename profile file** (updates recents accordingly).
 - **Session history** (connect/disconnect events and messages) stored locally; clear history action.
-- **Traffic indicators** (Linux): reads **`/proc/net/dev`** for the first matching **tun/tap** interface and exposes RX/TX byte counters to the UI for **instant bitrate** and **per-session totals** (delta since connect).
+- **Traffic indicators** (Linux): reads **`/proc/net/dev`** for the first matching **tun/tap** interface and exposes RX/TX byte counters to the UI for **instant bitrate** and **per-session totals** (delta since connect). Stats are accurately scoped to only display on the currently active profile.
 - **Tunnel interface name** shown in the UI while connected.
 - **Light / dark theme** toggle.
 - **Responsive layout** so the shell scales on wide and narrow windows.
@@ -18,7 +18,7 @@ Desktop application built with **Tauri 2** (TypeScript frontend, Rust backend). 
 
 - **Daemon and install script are aimed at Linux** (systemd, `/usr/sbin`, `/etc/openvpn-gui`, `/run/openvpn-gui`). The GUI may build on other platforms, but VPN control and traffic stats follow the Linux daemon and `/proc/net/dev` logic.
 - **Traffic stats** are unavailable (zeros) when not on Linux or when no tun/tap row is found; if several tunnels exist, the chosen interface follows the daemon’s selection order (tun preferred over tap, then name order).
-- **Protocol / cipher / remote** cards in the dashboard use **heuristic or placeholder** values from the profile filename where applicable; they are not parsed from the full `.ovpn` file yet.
+- **Protocol / cipher** cards in the dashboard use heuristic values from the profile filename where applicable. The **remote** directive is parsed from the actual `.ovpn` file or resolved from the OpenVPN logs.
 
 ## Architecture (short)
 
@@ -55,6 +55,12 @@ Build the desktop bundle:
 ```bash
 npm run tauri build
 ```
+
+### Packaging (.deb / .rpm)
+
+Tauri can automatically generate `.deb` and `.rpm` installers for Linux. Because `tauri.conf.json` is set to bundle `"all"` targets, simply running the build command above will create the packages in `src-tauri/target/release/bundle/`.
+
+> **Important**: The generated `.deb` and `.rpm` packages currently only include the **GUI frontend** (`openvpn-gui`). Because the `openvpn-gui-daemon` requires systemd integration and dynamically binds to the installing user's UID (for security), you must still run `npm run daemon:install` after installing the `.deb` or `.rpm` to properly configure the backend service.
 
 ## Installing the daemon (Linux)
 
