@@ -10,21 +10,23 @@ export async function refreshTrafficStats(): Promise<void> {
   const totalDownEl = byId<HTMLElement>("stat-total-down");
   const totalUpEl = byId<HTMLElement>("stat-total-up");
 
-  if (session.lastKnownStatus !== "connected") {
-    session.lastTrafficSample = null;
-    session.sessionTrafficBase = null;
+  const clearUI = () => {
     downEl.textContent = "—";
     upEl.textContent = "—";
     ifaceEl.textContent = "Interface : —";
     totalDownEl.textContent = "—";
     totalUpEl.textContent = "—";
+  };
+
+  if (session.lastKnownStatus !== "connected") {
+    session.lastTrafficSample = null;
+    session.sessionTrafficBase = null;
+    clearUI();
     return;
   }
 
   try {
     const sample = await backend.apiVpnIfaceTraffic();
-    ifaceEl.textContent =
-      sample.iface === "—" ? "Interface : aucune (tun/tap)" : `Interface : ${sample.iface}`;
 
     // Capture des valeurs initiales au premier échantillon de la session
     if (!session.sessionTrafficBase) {
@@ -33,17 +35,39 @@ export async function refreshTrafficStats(): Promise<void> {
 
     const now = Date.now() / 1000;
 
-    // Calcul et affichage du débit instantané
+    let currentDrx = 0;
+    let currentDtx = 0;
+    let validRate = false;
+
+    // Calcul du débit instantané
     if (session.lastTrafficSample) {
       const dt = now - session.lastTrafficSample.t;
       if (dt > 0.05) {
         const drx = sample.rxBytes - session.lastTrafficSample.rx;
         const dtx = sample.txBytes - session.lastTrafficSample.tx;
-        const safeDrx = drx < 0 ? 0 : drx;
-        const safeDtx = dtx < 0 ? 0 : dtx;
-        downEl.textContent = formatBitrate(safeDrx / dt);
-        upEl.textContent = formatBitrate(safeDtx / dt);
+        currentDrx = (drx < 0 ? 0 : drx) / dt;
+        currentDtx = (dtx < 0 ? 0 : dtx) / dt;
+        validRate = true;
       }
+    }
+
+    session.lastTrafficSample = { t: now, rx: sample.rxBytes, tx: sample.txBytes };
+
+    const selected = byId<HTMLInputElement>("profile-path").value.trim();
+    const active = session.lastActiveProfile;
+    const activeMatch = active != null && selected.length > 0 && selected === active.trim();
+
+    if (!activeMatch) {
+      clearUI();
+      return;
+    }
+
+    ifaceEl.textContent =
+      sample.iface === "—" ? "Interface : aucune (tun/tap)" : `Interface : ${sample.iface}`;
+
+    if (validRate) {
+      downEl.textContent = formatBitrate(currentDrx);
+      upEl.textContent = formatBitrate(currentDtx);
     } else {
       downEl.textContent = "—";
       upEl.textContent = "—";
@@ -55,11 +79,7 @@ export async function refreshTrafficStats(): Promise<void> {
     totalDownEl.textContent = formatBytes(sessionRx < 0 ? 0 : sessionRx);
     totalUpEl.textContent = formatBytes(sessionTx < 0 ? 0 : sessionTx);
 
-    session.lastTrafficSample = { t: now, rx: sample.rxBytes, tx: sample.txBytes };
   } catch {
-    downEl.textContent = "—";
-    upEl.textContent = "—";
-    totalDownEl.textContent = "—";
-    totalUpEl.textContent = "—";
+    clearUI();
   }
 }

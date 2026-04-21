@@ -5,6 +5,8 @@ export interface RecentProfile {
   lastUsedUnixMs: number;
   /** Nom affiché dans l'application uniquement (sinon le nom de fichier est utilisé). */
   displayName?: string | null;
+  /** Nom du dossier/groupe pour ranger le profil. */
+  group?: string | null;
 }
 
 export interface HistoryEntry {

@@ -38,6 +38,26 @@ export function syncVpnListRowStatusTexts(): void {
   }
 }
 
+export function syncProfileStatusIndicator(): void {
+  const root = byId<HTMLElement>("profile-status-root");
+  root.classList.remove("is-online", "is-connecting", "is-error");
+
+  const selected = byId<HTMLInputElement>("profile-path").value.trim();
+  const active = session.lastActiveProfile;
+  const activeMatch = active != null && selected.length > 0 && sameProfilePath(active, selected);
+  const st = session.lastKnownStatus;
+
+  if (activeMatch) {
+    if (st === "connected") {
+      root.classList.add("is-online");
+    } else if (st === "connecting") {
+      root.classList.add("is-connecting");
+    } else if (st === "error") {
+      root.classList.add("is-error");
+    }
+  }
+}
+
 export async function refreshStatus(): Promise<void> {
   try {
     const status = await backend.apiVpnStatus();
@@ -45,21 +65,7 @@ export async function refreshStatus(): Promise<void> {
     session.lastActiveProfile = status.activeProfile ?? null;
     applySessionRemoteFromStatus(status.status, status.activeProfile);
 
-    const selected = byId<HTMLInputElement>("profile-path").value.trim();
-    const active = status.activeProfile ?? null;
-    const activeMatch = active != null && selected.length > 0 && sameProfilePath(active, selected);
-
-    const root = byId<HTMLElement>("profile-status-root");
-    root.classList.remove("is-online", "is-connecting", "is-error");
-    if (activeMatch) {
-      if (status.status === "connected") {
-        root.classList.add("is-online");
-      } else if (status.status === "connecting") {
-        root.classList.add("is-connecting");
-      } else if (status.status === "error") {
-        root.classList.add("is-error");
-      }
-    }
+    syncProfileStatusIndicator();
 
     byId<HTMLElement>("status-label").textContent = mapStatusLabel(status.status);
     byId<HTMLElement>("active-profile").textContent = `Profil actif (démon) : ${status.activeProfile ?? "aucun"}`;

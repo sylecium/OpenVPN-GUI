@@ -18,14 +18,16 @@ function closeModal(): void {
   }
 }
 
-export function openProfileEditModal(profilePath: string, customDisplay: string): void {
+export function openProfileEditModal(profilePath: string, customDisplay: string, group: string): void {
   const root = byId<HTMLElement>("profile-edit-modal");
   const form = byId<HTMLFormElement>("profile-edit-form");
   const nameInput = byId<HTMLInputElement>("profile-edit-display-name");
+  const groupInput = byId<HTMLInputElement>("profile-edit-group");
   const pathInput = byId<HTMLInputElement>("profile-edit-file-path");
 
   form.dataset.startPath = profilePath;
   nameInput.value = customDisplay.trim();
+  groupInput.value = group.trim();
   pathInput.value = profilePath;
 
   const hint = byId<HTMLElement>("profile-edit-basename-hint");
@@ -51,9 +53,11 @@ export function openProfileEditModal(profilePath: string, customDisplay: string)
 
 async function saveProfileEdits(originalPath: string): Promise<void> {
   const nameInput = byId<HTMLInputElement>("profile-edit-display-name");
+  const groupInput = byId<HTMLInputElement>("profile-edit-group");
   const pathInput = byId<HTMLInputElement>("profile-edit-file-path");
   const newPath = pathInput.value.trim();
   const displayTrim = nameInput.value.trim();
+  const groupTrim = groupInput.value.trim();
 
   if (!newPath) {
     setFeedback("Le chemin du fichier ne peut pas être vide.", true);
@@ -67,9 +71,10 @@ async function saveProfileEdits(originalPath: string): Promise<void> {
     if (newPath !== originalPath) {
       pathAfter = await backend.apiRenameProfileFile(originalPath, newPath);
     }
-    await backend.apiSetProfileDisplayName(
+    await backend.apiSetProfileMetadata(
       pathAfter,
       displayTrim.length > 0 ? displayTrim : null,
+      groupTrim.length > 0 ? groupTrim : null,
     );
 
     byId<HTMLInputElement>("profile-path").value = pathAfter;

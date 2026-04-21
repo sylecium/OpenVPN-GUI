@@ -17,6 +17,8 @@ struct RecentProfile {
     /// Libellé affiché dans l'application uniquement (le chemin fichier reste inchangé).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     display_name: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    group: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -237,6 +239,7 @@ fn upsert_recent_profile(profile_path: String) -> Result<(), String> {
             path: profile_path,
             last_used_unix_ms: now,
             display_name: None,
+            group: None,
         });
     }
     if current.len() > 20 {
@@ -261,11 +264,20 @@ fn history_clear() -> Result<(), String> {
 }
 
 #[tauri::command]
-fn set_profile_display_name(
+fn set_profile_metadata(
     profile_path: String,
     display_name: Option<String>,
+    group: Option<String>,
 ) -> Result<(), String> {
-    let normalized = display_name.and_then(|s| {
+    let normalized_display = display_name.and_then(|s| {
+        let t = s.trim().to_owned();
+        if t.is_empty() {
+            None
+        } else {
+            Some(t)
+        }
+    });
+    let normalized_group = group.and_then(|s| {
         let t = s.trim().to_owned();
         if t.is_empty() {
             None
@@ -278,7 +290,8 @@ fn set_profile_display_name(
     let Some(entry) = current.iter_mut().find(|item| item.path == profile_path) else {
         return Err("profil absent de la liste récente".to_string());
     };
-    entry.display_name = normalized;
+    entry.display_name = normalized_display;
+    entry.group = normalized_group;
     write_json_file(&path, &current)
 }
 
@@ -470,7 +483,7 @@ pub fn run() {
             remove_recent_profile,
             history_entries,
             history_clear,
-            set_profile_display_name,
+            set_profile_metadata,
             rename_profile_file
         ])
         .run(tauri::generate_context!())

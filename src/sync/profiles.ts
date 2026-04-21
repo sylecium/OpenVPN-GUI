@@ -5,11 +5,11 @@ import { byId } from "../lib/dom";
 import { setFeedback } from "../ui/feedback";
 import { refreshServerMetaForProfile, resetServerMetaEmpty } from "../ui/server-meta-view";
 import { createVpnSidebarRow } from "../ui/ovpn-row";
-import { syncVpnListRowStatusTexts } from "./status";
+import { syncVpnListRowStatusTexts, syncProfileStatusIndicator } from "./status";
 
 let vpnListDragAbort: AbortController | null = null;
 
-function collectPathsFromVpnList(list: HTMLUListElement): string[] {
+function collectPathsFromVpnList(list: HTMLElement): string[] {
   return [...list.querySelectorAll<HTMLLIElement>(".vpn-item[data-path]")]
     .map((li) => li.dataset.path)
     .filter((path): path is string => Boolean(path));
@@ -27,7 +27,7 @@ function pathsEqual(a: string[], b: string[]): boolean {
   return true;
 }
 
-function getDragAfterElement(list: HTMLUListElement, y: number): HTMLLIElement | null {
+function getDragAfterElement(list: HTMLElement, y: number): HTMLLIElement | null {
   const candidates = [
     ...list.querySelectorAll<HTMLLIElement>(".vpn-item[data-path]:not(.vpn-item--dragging)"),
   ];
@@ -47,7 +47,7 @@ function getDragAfterElement(list: HTMLUListElement, y: number): HTMLLIElement |
 
 /** Réordonnancement par glisser-déposer (profils enregistrés uniquement). */
 function initVpnListDragDrop(): void {
-  const list = byId<HTMLUListElement>("vpn-list");
+  const list = byId<HTMLElement>("vpn-list");
   vpnListDragAbort?.abort();
   vpnListDragAbort = new AbortController();
   const { signal } = vpnListDragAbort;
@@ -84,15 +84,20 @@ function initVpnListDragDrop(): void {
       if (event.dataTransfer) {
         event.dataTransfer.dropEffect = "move";
       }
-      const dragging = list.querySelector<HTMLElement>(".vpn-item--dragging");
-      if (!dragging || !list.contains(dragging)) {
+      const dragging = document.querySelector<HTMLElement>(".vpn-item--dragging");
+      if (!dragging) {
         return;
       }
-      const after = getDragAfterElement(list, event.clientY);
+      
+      const targetUl = (event.target as HTMLElement).closest("ul.vpn-group-list") as HTMLElement | null;
+      const container = targetUl ?? list.querySelector<HTMLElement>(".root-group-list");
+      if (!container) return;
+
+      const after = getDragAfterElement(container, event.clientY);
       if (after == null) {
-        list.append(dragging);
+        container.append(dragging);
       } else if (after !== dragging) {
-        list.insertBefore(dragging, after);
+        container.insertBefore(dragging, after);
       }
     },
     { signal },
@@ -113,19 +118,45 @@ function initVpnListDragDrop(): void {
       if (!(el instanceof HTMLElement)) {
         return;
       }
-      const li = el.closest("li.vpn-item[data-path]");
+      const li = el.closest<HTMLLIElement>("li.vpn-item[data-path]");
       li?.classList.remove("vpn-item--dragging");
+      
+      if (!li) return;
+
       const snapshot = orderAtDragStart;
       orderAtDragStart = [];
       if (snapshot.length === 0) {
         return;
       }
+
+      const newUl = li.closest("ul.vpn-group-list");
+      let newGroup: string | null = null;
+      if (newUl && !newUl.classList.contains("root-group-list")) {
+        const details = newUl.closest("details");
+        if (details) {
+          const titleEl = details.querySelector(".vpn-group-title");
+          newGroup = titleEl?.textContent || null;
+        }
+      }
+
+      const draggedPath = li.dataset.path || "";
+      const btn = li.querySelector<HTMLButtonElement>("button[data-ovpn-action='edit']");
+      const oldGroup = btn?.dataset.group || null;
+
       const nowOrder = collectPathsFromVpnList(list);
-      if (pathsEqual(nowOrder, snapshot)) {
+      const orderChanged = !pathsEqual(nowOrder, snapshot);
+      const groupChanged = (newGroup || "") !== (oldGroup || "");
+
+      if (!orderChanged && !groupChanged) {
         return;
       }
+
       void (async () => {
         try {
+          if (groupChanged) {
+             const customDisplay = btn?.dataset.customDisplay || null;
+             await backend.apiSetProfileMetadata(draggedPath, customDisplay, newGroup);
+          }
           await backend.apiReorderRecentProfiles(nowOrder);
           const recent = await backend.apiRecentProfiles();
           fillServerSelect(recent);
@@ -173,11 +204,11 @@ function syncVpnListSelectionHighlight(): void {
   }
 }
 
-/** Après changement de chemin ou rechargement de la liste : panneau principal + surbrillance liste. */
 export function syncVpnSidebarFromProfilePath(): void {
   syncContentVisibility();
   syncVpnListSelectionHighlight();
   syncVpnListRowStatusTexts();
+  syncProfileStatusIndicator();
 }
 
 export function fillServerSelect(recent: RecentProfile[]): void {
@@ -222,7 +253,7 @@ export async function refreshRecentProfiles(): Promise<void> {
     const recent = await backend.apiRecentProfiles();
     fillServerSelect(recent);
 
-    const list = byId<HTMLUListElement>("vpn-list");
+    const list = byId<HTMLElement>("vpn-list");
     list.replaceChildren();
 
     if (recent.length === 0) {
@@ -233,14 +264,61 @@ export async function refreshRecentProfiles(): Promise<void> {
       return;
     }
 
+    const groups = new Map<string, HTMLElement[]>();
+    const rootItems: HTMLElement[] = [];
+
     for (const profile of recent) {
-      list.append(
-        createVpnSidebarRow({
-          path: profile.path,
-          displayName: profile.displayName,
-        }),
-      );
+      const row = createVpnSidebarRow({
+        path: profile.path,
+        displayName: profile.displayName,
+        group: profile.group,
+      });
+
+      if (profile.group) {
+        if (!groups.has(profile.group)) {
+          groups.set(profile.group, []);
+        }
+        groups.get(profile.group)!.push(row);
+      } else {
+        rootItems.push(row);
+      }
     }
+
+    const sortedGroups = Array.from(groups.keys()).sort((a, b) => a.localeCompare(b));
+
+    for (const groupName of sortedGroups) {
+      const details = document.createElement("details");
+      details.className = "vpn-group";
+      details.open = true;
+
+      const summary = document.createElement("summary");
+      summary.className = "vpn-group-header";
+      
+      const icon = document.createElement("span");
+      icon.className = "vpn-group-icon";
+      icon.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+      
+      const title = document.createElement("span");
+      title.className = "vpn-group-title";
+      title.textContent = groupName;
+      
+      summary.append(icon, title);
+
+      const ul = document.createElement("ul");
+      ul.className = "vpn-group-list";
+      ul.append(...groups.get(groupName)!);
+
+      details.append(summary, ul);
+      list.append(details);
+    }
+
+    const ulRoot = document.createElement("ul");
+    ulRoot.className = "vpn-group-list root-group-list";
+    if (rootItems.length > 0) {
+      ulRoot.append(...rootItems);
+    }
+    list.append(ulRoot);
+
     initVpnListDragDrop();
     syncVpnSidebarFromProfilePath();
   } catch (error) {

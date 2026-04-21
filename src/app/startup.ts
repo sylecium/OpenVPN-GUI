@@ -32,7 +32,11 @@ function bindVpnListDelegation(): void {
     }
     const editBtn = target.closest("button[data-ovpn-action='edit']");
     if (editBtn instanceof HTMLButtonElement && editBtn.dataset.path) {
-      openProfileEditModal(editBtn.dataset.path, editBtn.dataset.customDisplay ?? "");
+      openProfileEditModal(
+        editBtn.dataset.path,
+        editBtn.dataset.customDisplay ?? "",
+        editBtn.dataset.group ?? "",
+      );
       return;
     }
     const item = target.closest(".vpn-item[data-path]");

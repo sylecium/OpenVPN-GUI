@@ -1,9 +1,10 @@
 use std::fs;
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, Write};
 use std::net::Shutdown;
 use std::os::fd::AsRawFd;
 use std::os::unix::fs::PermissionsExt;
 use std::os::unix::net::{UnixListener, UnixStream};
+use std::os::unix::process::CommandExt;
 use std::path::Path;
 use std::process::{Child, Command as ProcessCommand, Stdio};
 use std::sync::{Arc, Mutex};
@@ -197,10 +198,39 @@ fn terminate_openvpn_child(child: &mut Child) -> std::io::Result<()> {
     let pid = child.id() as libc::pid_t;
     if pid > 0 {
         unsafe {
+            // Send SIGINT to the process group to trigger a clean shutdown
+            libc::kill(-pid, libc::SIGINT);
+        }
+        
+        // Wait up to 2 seconds for a graceful exit
+        for _ in 0..20 {
+            if let Ok(Some(_)) = child.try_wait() {
+                return Ok(());
+            }
+            std::thread::sleep(Duration::from_millis(100));
+        }
+
+        unsafe {
+            // If still alive, send SIGTERM to the process group
             libc::kill(-pid, libc::SIGTERM);
         }
+        
+        // Wait up to 2 more seconds
+        for _ in 0..20 {
+            if let Ok(Some(_)) = child.try_wait() {
+                return Ok(());
+            }
+            std::thread::sleep(Duration::from_millis(100));
+        }
+        
+        unsafe {
+            // Force kill the entire process group if it's still hanging around
+            libc::kill(-pid, libc::SIGKILL);
+        }
     }
-    child.kill()
+    // Fallback to ensure the std::process::Child state is updated
+    let _ = child.kill();
+    child.wait().map(|_| ())
 }
 
 fn connect_vpn(
@@ -244,6 +274,14 @@ fn connect_vpn(
         .stderr(Stdio::piped());
     for arg in &config.extra_args {
         cmd.arg(arg);
+    }
+
+    // Isolate the process in its own process group so we can signal it correctly
+    unsafe {
+        cmd.pre_exec(|| {
+            libc::setpgid(0, 0);
+            Ok(())
+        });
     }
 
     let mut child = match cmd.spawn() {

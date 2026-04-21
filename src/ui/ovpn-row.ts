@@ -58,6 +58,7 @@ function trashIcon(): SVGSVGElement {
 export function createVpnSidebarRow(profile: {
   path: string;
   displayName?: string | null;
+  group?: string | null;
   isDemo?: boolean;
 }): HTMLLIElement {
   const li = document.createElement("li");
@@ -103,6 +104,10 @@ export function createVpnSidebarRow(profile: {
     const custom = profile.displayName?.trim();
     if (custom) {
       editBtn.dataset.customDisplay = custom;
+    }
+    const group = profile.group?.trim();
+    if (group) {
+      editBtn.dataset.group = group;
     }
   }
 

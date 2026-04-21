@@ -48,11 +48,12 @@ export async function apiRemoveRecentProfile(profilePath: string): Promise<void>
   return invoke("remove_recent_profile", { profilePath });
 }
 
-export async function apiSetProfileDisplayName(
+export async function apiSetProfileMetadata(
   profilePath: string,
   displayName: string | null,
+  group: string | null,
 ): Promise<void> {
-  return invoke("set_profile_display_name", { profilePath, displayName });
+  return invoke("set_profile_metadata", { profilePath, displayName, group });
 }
 
 export async function apiRenameProfileFile(oldPath: string, newPath: string): Promise<string> {
