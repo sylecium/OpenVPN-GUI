@@ -13,6 +13,7 @@
     "daemon:uninstall": "bash ./packaging/uninstall-daemon.sh",
     "daemon:status": "sudo systemctl status openvpn-gui-daemon.service --no-pager",
     "build:deb": "bash ./packaging/build-deb.sh",
+    "release": "bash ./scripts/release.sh",
     "prepare": "husky"
   },
   "dependencies": {
