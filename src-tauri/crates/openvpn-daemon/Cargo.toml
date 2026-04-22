@@ -1,7 +1,8 @@
 [package]
 name = "openvpn-daemon"
-version = "0.1.0"
+version = "0.1.1"
 description = "System-facing daemon: Unix control socket (peer UID check), spawn OpenVPN from .ovpn path, stream logs, connect/disconnect/status."
+license = "MIT"
 edition = "2021"
 
 [dependencies]

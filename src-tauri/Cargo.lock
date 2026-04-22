@@ -2338,7 +2338,7 @@ dependencies = [
 
 [[package]]
 name = "openvpn-daemon"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "libc",
  "openvpn-ipc",
@@ -2349,7 +2349,7 @@ dependencies = [
 
 [[package]]
 name = "openvpn-gui"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "openvpn-ipc",
  "serde",
@@ -2362,7 +2362,7 @@ dependencies = [
 
 [[package]]
 name = "openvpn-ipc"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "serde",
  "serde_json",

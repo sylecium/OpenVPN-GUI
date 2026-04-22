@@ -2,6 +2,8 @@
   "name": "openvpn-gui",
   "private": true,
   "version": "0.1.1",
+  "license": "MIT",
+  "author": "sylecium",
   "description": "Tauri 2 desktop client for OpenVPN on Linux: profiles, daemon control over Unix socket, logs, session history, tun/tap traffic (instant + session totals via /proc/net/dev).",
   "type": "module",
   "scripts": {
