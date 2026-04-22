@@ -52,11 +52,9 @@
           "/usr/sbin/openvpn-gui-daemon": "target/release/openvpn-daemon",
           "/etc/systemd/system/openvpn-gui-daemon.service": "../systemd/openvpn-gui-daemon.service"
         },
-        "scripts": {
-          "post": "../packaging/rpm/post",
-          "preun": "../packaging/rpm/preun",
-          "postun": "../packaging/rpm/postun"
-        }
+        "postInstallScript": "../packaging/rpm/post",
+        "preRemoveScript": "../packaging/rpm/preun",
+        "postRemoveScript": "../packaging/rpm/postun"
       }
     }
   }
