@@ -25,6 +25,7 @@ jobs:
             openvpn \
             alien \
             dpkg-dev \
+            rpm \
             libwebkit2gtk-4.1-dev \
             libappindicator3-dev \
             librsvg2-dev \
@@ -74,15 +75,14 @@ jobs:
           echo "path=$DEB"        >> "$GITHUB_OUTPUT"
           echo "name=$(basename "$DEB")" >> "$GITHUB_OUTPUT"
 
-      # ── RPM conversion ─────────────────────────────────────────────────────
-      - name: Convert .deb to .rpm (alien)
+      # ── RPM build ──────────────────────────────────────────────────────────
+      - name: Build native RPM package
         id: rpm
         run: |
-          # alien outputs the .rpm in the current directory
-          sudo alien --to-rpm --scripts "${{ steps.deb.outputs.path }}"
-          RPM=$(find . -maxdepth 1 -name "*.rpm" -type f | head -1)
+          npm run build:rpm
+          RPM=$(find src-tauri/target/release/bundle/rpm -name "*.rpm" -type f | head -1)
           if [[ -z "$RPM" ]]; then
-            echo "::error::alien did not produce a .rpm file"
+            echo "::error::No .rpm file found after build"
             exit 1
           fi
           echo "path=$RPM"        >> "$GITHUB_OUTPUT"

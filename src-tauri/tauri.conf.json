@@ -43,6 +43,20 @@
           "/usr/sbin/openvpn-gui-daemon": "target/release/openvpn-daemon",
           "/etc/systemd/system/openvpn-gui-daemon.service": "../systemd/openvpn-gui-daemon.service"
         }
+      },
+      "rpm": {
+        "depends": [
+          "openvpn"
+        ],
+        "files": {
+          "/usr/sbin/openvpn-gui-daemon": "target/release/openvpn-daemon",
+          "/etc/systemd/system/openvpn-gui-daemon.service": "../systemd/openvpn-gui-daemon.service"
+        },
+        "scripts": {
+          "post": "../packaging/rpm/post",
+          "preun": "../packaging/rpm/preun",
+          "postun": "../packaging/rpm/postun"
+        }
       }
     }
   }

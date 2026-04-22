@@ -1,0 +1,12 @@
+#!/bin/sh
+# RPM %preun script
+
+if [ "$1" -eq 0 ]; then
+    # Real uninstallation, not upgrade
+    if [ -d /run/systemd/system ]; then
+        systemctl stop openvpn-gui-daemon.service || true
+        systemctl disable openvpn-gui-daemon.service || true
+    fi
+fi
+
+exit 0

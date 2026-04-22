@@ -1,0 +1,47 @@
+#!/bin/sh
+# RPM %post script
+
+# Detect the physical user who ran the installation
+if [ -n "$SUDO_USER" ] && [ "$SUDO_USER" != "root" ]; then
+    TARGET_USER="$SUDO_USER"
+else
+    # Fallback for graphical installers
+    TARGET_USER=$(awk -F':' '{ if ($3 >= 1000 && $3 <= 60000) print $1 }' /etc/passwd | head -n1)
+fi
+
+if [ -z "$TARGET_USER" ]; then
+    TARGET_USER="root"
+fi
+
+TARGET_UID=$(id -u "$TARGET_USER")
+
+# Find openvpn binary
+OPENVPN_BIN="/usr/sbin/openvpn"
+if ! command -v openvpn >/dev/null 2>&1; then
+    if [ -x "/usr/bin/openvpn" ]; then
+        OPENVPN_BIN="/usr/bin/openvpn"
+    fi
+fi
+
+# Configure daemon
+mkdir -p /etc/openvpn-gui
+
+# Only generate config if it doesn't exist to avoid overwriting user changes on upgrade
+if [ ! -f /etc/openvpn-gui/daemon.toml ]; then
+    cat > /etc/openvpn-gui/daemon.toml <<EOF
+socket_path = "/run/openvpn-gui/openvpn-gui.sock"
+allowed_uid = ${TARGET_UID}
+openvpn_binary = "${OPENVPN_BIN}"
+extra_args = ["--verb", "3"]
+max_logs = 500
+EOF
+    chmod 644 /etc/openvpn-gui/daemon.toml
+fi
+
+# Reload systemd and enable service
+if [ -d /run/systemd/system ]; then
+    systemctl daemon-reload || true
+    systemctl enable --now openvpn-gui-daemon.service || true
+fi
+
+exit 0

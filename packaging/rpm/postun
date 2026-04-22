@@ -1,0 +1,15 @@
+#!/bin/sh
+# RPM %postun script
+
+if [ -d /run/systemd/system ]; then
+    systemctl daemon-reload || true
+fi
+
+if [ "$1" -ge 1 ]; then
+    # Upgrade: restart service if it was running
+    if [ -d /run/systemd/system ]; then
+        systemctl try-restart openvpn-gui-daemon.service || true
+    fi
+fi
+
+exit 0
