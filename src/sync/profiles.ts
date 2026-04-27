@@ -1,5 +1,5 @@
 import * as backend from "../api/backend";
-import { basename, profileDisplayLabel } from "../lib/format";
+import { profileDisplayLabel } from "../lib/format";
 import type { RecentProfile } from "../types/ipc";
 import { byId } from "../lib/dom";
 import { setFeedback } from "../ui/feedback";
