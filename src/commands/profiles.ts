@@ -63,6 +63,13 @@ export async function removeProfileFromRecents(profilePath: string): Promise<voi
 
 export function onServerSelectChange(value: string): void {
   byId<HTMLInputElement>("profile-path").value = value;
+  
+  // Synchronise le select caché pour que syncContentVisibility trouve le bon label
+  const select = byId<HTMLSelectElement>("server-select");
+  if (select.value !== value) {
+    select.value = value;
+  }
+
   if (value) {
     refreshServerMetaForProfile(value);
     setFeedback("Profil sélectionné");
@@ -71,3 +78,4 @@ export function onServerSelectChange(value: string): void {
   }
   syncVpnSidebarFromProfilePath();
 }
+

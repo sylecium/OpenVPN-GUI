@@ -184,19 +184,35 @@ export function syncContentVisibility(): void {
   const empty = byId<HTMLElement>("empty-state");
   const content = byId<HTMLElement>("content-view");
   const has = path.length > 0;
+  
   empty.classList.toggle("hidden", has);
   content.classList.toggle("hidden", !has);
+  
   if (has) {
     const select = byId<HTMLSelectElement>("server-select");
     const opt = select.selectedOptions[0];
-    const label =
-      opt && opt.value === path && opt.textContent?.trim()
-        ? opt.textContent.trim()
-        : basename(path);
+    
+    // On essaie de récupérer le label (nom personnalisé) depuis le select ou la sidebar
+    let label = "";
+    
+    if (opt && opt.value === path && opt.textContent?.trim()) {
+      label = opt.textContent.trim();
+    } else {
+      // Recherche directe dans la sidebar si le select n'est pas synchro
+      const sidebarItem = document.querySelector(`.vpn-item[data-path="${CSS.escape(path)}"] .vpn-name`);
+      if (sidebarItem && sidebarItem.textContent) {
+        label = sidebarItem.textContent.trim();
+      } else {
+        // Fallback ultime : nom de fichier sans extension (via profileDisplayLabel logic)
+        label = profileDisplayLabel(path);
+      }
+    }
+
     byId<HTMLElement>("current-vpn-name").textContent = label;
     byId<HTMLElement>("current-vpn-path").textContent = path;
   }
 }
+
 
 function syncVpnListSelectionHighlight(): void {
   const current = byId<HTMLInputElement>("profile-path").value;
