@@ -92,12 +92,10 @@
 
 .import-section {
   padding: 16px 16px 12px;
-  display: flex;
-  gap: 8px;
 }
 
 .import-btn {
-  flex: 1;
+  width: 100%;
   min-height: var(--touch-min);
   padding: 10px 12px;
   background: var(--surface-bg);
@@ -111,25 +109,6 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-}
-
-.import-btn-secondary {
-  width: 42px;
-  height: 42px;
-  flex-shrink: 0;
-  background: var(--surface-bg);
-  border: 1px dashed var(--surface-border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.import-btn-secondary:hover:not(:disabled) {
-  border-color: var(--text-secondary);
-  background: var(--surface-hover);
 }
 
 .import-btn:hover:not(:disabled) {
