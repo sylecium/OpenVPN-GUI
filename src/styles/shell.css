@@ -37,21 +37,29 @@
 }
 
 .sidebar-header {
-  padding: 20px 20px 16px;
+  padding: 16px 12px 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   border-bottom: 1px solid var(--surface-border);
 }
 
 .brand {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 8px;
   color: var(--text-primary);
+}
+
+.brand-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+  line-height: 1.2;
 }
 
 .brand svg {
@@ -61,14 +69,15 @@
   fill: none;
   stroke-width: 2;
   flex-shrink: 0;
+  margin-top: -2px;
 }
 
 .theme-toggle {
   background: transparent;
   border: 1px solid var(--surface-border);
   color: var(--text-secondary);
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-sm);
   cursor: pointer;
   display: flex;
@@ -966,15 +975,22 @@ details.vpn-group[open] > .vpn-group-header .vpn-group-icon {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 0 12px 12px;
+  padding: 0 12px 8px;
 }
 
 .app-version {
+  display: inline-flex;
+  align-items: center;
   font-size: 10px;
   color: var(--text-muted);
   font-family: var(--font-mono);
   letter-spacing: 0.05em;
-  opacity: 0.7;
+  opacity: 0.75;
+  font-weight: 600;
+  background: var(--bg-input);
+  padding: 1px 4px;
+  border-radius: 4px;
+  border: 1px solid var(--surface-border);
 }
 
 .feedback {
