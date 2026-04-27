@@ -27,6 +27,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "createUpdaterArtifacts": true,
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -39,6 +40,11 @@
         "depends": [
           "openvpn"
         ],
+        "scripts": {
+          "postinst": "../packaging/debian/postinst",
+          "prerm": "../packaging/debian/prerm",
+          "postrm": "../packaging/debian/postrm"
+        },
         "files": {
           "/usr/sbin/openvpn-gui-daemon": "target/release/openvpn-daemon",
           "/etc/systemd/system/openvpn-gui-daemon.service": "../systemd/openvpn-gui-daemon.service"
@@ -56,6 +62,14 @@
         "preRemoveScript": "../packaging/rpm/preun",
         "postRemoveScript": "../packaging/rpm/postun"
       }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/sylecium/OpenVPN-GUI/releases/latest/download/latest.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEEyNjRDRUE1MDQyOEQyMzYKUldRMjBpZ0VwYzVrb2lyNmJrTnEzcVVNdVlTSC8xclhWSjlOY0MvTWhYU1dDaWl0MUFnYlBYRmIK"
     }
   }
 }

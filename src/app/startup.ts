@@ -13,6 +13,7 @@ import { refreshLogs, clearLogsView, copyLogsToClipboard } from "../sync/logs";
 import { refreshTrafficStats } from "../sync/traffic";
 import { initThemeToggle } from "../ui/theme";
 import { setFeedback } from "../ui/feedback";
+import { checkForAppUpdate } from "./updater";
 
 function refreshAll(): void {
   void refreshStatus();
@@ -92,6 +93,7 @@ export async function runInitialSync(): Promise<void> {
   await refreshHistory();
   await refreshStatus();
   await refreshLogs();
+  void checkForAppUpdate();
 }
 
 export function startIntervals(): void {
