@@ -298,10 +298,25 @@ fn set_profile_metadata(
 #[tauri::command]
 fn rename_profile_file(old_path: String, new_path: String) -> Result<String, String> {
     let old_path = old_path.trim().to_string();
-    let new_path = new_path.trim().to_string();
-    if old_path.is_empty() || new_path.is_empty() {
+    let new_path_raw = new_path.trim().to_string();
+    if old_path.is_empty() || new_path_raw.is_empty() {
         return Err("invalid paths".to_string());
     }
+
+    let old_buf = PathBuf::from(&old_path);
+    let mut new_buf = PathBuf::from(&new_path_raw);
+
+    // Si le nouveau chemin n'est qu'un nom de fichier (pas absolu), on le garde dans le même dossier.
+    if !new_buf.is_absolute() {
+        if let Some(parent) = old_buf.parent() {
+            if !parent.as_os_str().is_empty() {
+                new_buf = parent.join(new_buf);
+            }
+        }
+    }
+
+    let new_path = new_buf.to_string_lossy().to_string();
+
     if old_path == new_path {
         return Ok(new_path);
     }
@@ -312,21 +327,19 @@ fn rename_profile_file(old_path: String, new_path: String) -> Result<String, Str
         return Err("profile not in recent list".to_string());
     }
 
-    let old = Path::new(&old_path);
-    let new = Path::new(&new_path);
-    if !old.is_file() {
+    if !old_buf.is_file() {
         return Err("source file not found or not accessible".to_string());
     }
-    if new.exists() {
+    if new_buf.exists() {
         return Err("a file already exists at this destination".to_string());
     }
-    if let Some(parent) = new.parent() {
+    if let Some(parent) = new_buf.parent() {
         if !parent.as_os_str().is_empty() {
             fs::create_dir_all(parent)
                 .map_err(|e| format!("cannot create target folder: {e}"))?;
         }
     }
-    fs::rename(old, new).map_err(|e| format!("cannot rename file: {e}"))?;
+    fs::rename(&old_buf, &new_buf).map_err(|e| format!("cannot rename file: {e}"))?;
 
     let Some(entry) = current.iter_mut().find(|item| item.path == old_path) else {
         return Err("recent list inconsistency after rename".to_string());
@@ -335,6 +348,7 @@ fn rename_profile_file(old_path: String, new_path: String) -> Result<String, Str
     write_json_file(&path, &current)?;
     Ok(new_path)
 }
+
 
 fn append_history_event(
     event: String,

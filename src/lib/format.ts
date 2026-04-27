@@ -7,14 +7,19 @@ export function basename(path: string): string {
   return index === -1 ? normalized : normalized.slice(index + 1);
 }
 
-/** Libellé utilisé dans l'UI : nom personnalisé ou nom de fichier. */
+/** Libellé utilisé dans l'UI : nom personnalisé ou nom de fichier sans extension. */
 export function profileDisplayLabel(path: string, displayName?: string | null): string {
   const trimmed = displayName?.trim();
   if (trimmed) {
     return trimmed;
   }
-  return basename(path);
+  const name = basename(path);
+  if (name.toLowerCase().endsWith(".ovpn")) {
+    return name.slice(0, -5);
+  }
+  return name;
 }
+
 
 export function formatHistoryEvent(event: string): string {
   switch (event) {
