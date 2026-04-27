@@ -1,4 +1,5 @@
 import { byId } from "../lib/dom";
+import * as backend from "../api/backend";
 import { onPowerClick } from "../commands/vpn";
 import {
   browseForProfile,
@@ -12,8 +13,11 @@ import { refreshStatus } from "../sync/status";
 import { refreshLogs, clearLogsView, copyLogsToClipboard } from "../sync/logs";
 import { refreshTrafficStats } from "../sync/traffic";
 import { initThemeToggle } from "../ui/theme";
+import { bindSettingsModal, openSettingsModal } from "../ui/settings-modal";
 import { setFeedback } from "../ui/feedback";
-import { initI18n, toggleLanguage, t } from "../i18n";
+import { t } from "../i18n";
+import * as settings from "../lib/settings";
+import { session } from "../state/session";
 import { getVersion } from "@tauri-apps/api/app";
 import { checkForAppUpdate } from "./updater";
 
@@ -86,6 +90,14 @@ export function bootstrapApp(): void {
 
   bindVpnListDelegation();
   bindProfileEditModal();
+  bindSettingsModal();
+
+  const settingsBtn = byId<HTMLButtonElement>("settings-btn");
+  if (settingsBtn) {
+    settingsBtn.addEventListener("click", () => {
+      openSettingsModal();
+    });
+  }
 
   const clearHist = document.getElementById("clear-history-btn");
   if (clearHist instanceof HTMLButtonElement) {
@@ -101,6 +113,18 @@ export async function runInitialSync(): Promise<void> {
   await refreshStatus();
   await refreshLogs();
   void checkForAppUpdate();
+
+  // Auto-connect on startup logic
+  const sett = settings.getSettings();
+  if (sett.autoConnect && session.lastKnownStatus === "idle") {
+    const last = settings.getLastUsedProfile();
+    if (last) {
+      console.log("Auto-connecting to:", last);
+      backend.apiVpnConnect(last).catch((err) => {
+        console.error("Auto-connect failed:", err);
+      });
+    }
+  }
 }
 
 export function startIntervals(): void {

@@ -113,6 +113,29 @@
             </div>
             <div class="sidebar-footer-meta">
               <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
+              <button
+                id="settings-btn"
+                type="button"
+                class="settings-btn"
+                data-i18n="btn.settings.aria"
+                aria-label="Settings"
+                title="Settings"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
             </div>
           </div>
         </aside>
@@ -295,6 +318,49 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+    <div
+      id="settings-modal"
+      class="settings-modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="settings-title"
+      aria-hidden="true"
+    >
+      <div id="settings-modal-backdrop" class="settings-modal__backdrop" aria-hidden="true"></div>
+      <div class="settings-modal__panel" role="document">
+        <div class="settings-modal__header">
+          <h2 id="settings-title" data-i18n="modal.settings.title">Settings & Preferences</h2>
+          <button id="settings-close" class="settings-modal__close-btn" aria-label="Close" data-i18n="modal.btn.close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="settings-modal__body">
+          <section class="settings-group">
+            <h3 class="settings-group__title" data-i18n="modal.settings.general">General</h3>
+            <div class="settings-list">
+              <div class="settings-row">
+                <div class="settings-row__info">
+                  <span class="settings-row__label" data-i18n="modal.settings.autoConnect">Auto-connect on startup</span>
+                  <span class="settings-row__desc" data-i18n="modal.settings.autoConnectDesc">Automatically connect to the last used profile when the app starts.</span>
+                </div>
+                <div class="settings-row__action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-auto-connect">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+            </div>
+          </section>
+          </section>
+        </div>
       </div>
     </div>
   </body>

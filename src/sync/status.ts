@@ -10,6 +10,7 @@ import {
   refreshStatRemoteDisplay,
 } from "../ui/server-meta-view";
 import { refreshTrafficStats } from "./traffic";
+import { setLastUsedProfile } from "../lib/settings";
 
 function sameProfilePath(a: string, b: string): boolean {
   return a.trim() === b.trim();
@@ -62,6 +63,8 @@ export function syncProfileStatusIndicator(): void {
 export async function refreshStatus(): Promise<void> {
   try {
     const status = await backend.apiVpnStatus();
+    const prevStatus = session.lastKnownStatus;
+    
     session.lastKnownStatus = status.status;
     session.lastActiveProfile = status.activeProfile ?? null;
     applySessionRemoteFromStatus(status.status, status.activeProfile);
@@ -74,6 +77,13 @@ export async function refreshStatus(): Promise<void> {
     updateConnectLabels(status.status);
     syncVpnListRowStatusTexts();
     refreshStatRemoteDisplay();
+
+    // Persist last used profile on successful connection
+    if (status.status === "connected" && status.activeProfile) {
+      setLastUsedProfile(status.activeProfile);
+    }
+
+
     await refreshTrafficStats();
   } catch (error) {
     setFeedback(String(error), true);

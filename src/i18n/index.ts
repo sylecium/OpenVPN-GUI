@@ -90,6 +90,13 @@ const translations: Record<Language, Dictionary> = {
     "btn.edit.aria": "Edit profile (display name, path)",
     "btn.remove.aria": "Remove from list",
     "status.demoTitle": "Unsaved example",
+    "btn.settings": "Settings",
+    "btn.settings.aria": "Open settings and preferences",
+    "modal.settings.title": "Settings & Preferences",
+    "modal.settings.general": "General",
+    "modal.settings.autoConnect": "Auto-connect on startup",
+    "modal.settings.autoConnectDesc": "Automatically connect to the last used profile when the app starts.",
+    "modal.btn.close": "Close",
   },
   fr: {
     "app.title": "OpenVPN-GUI",
@@ -178,6 +185,13 @@ const translations: Record<Language, Dictionary> = {
     "btn.edit.aria": "Modifier le profil (nom affiché, chemin)",
     "btn.remove.aria": "Retirer de la liste",
     "status.demoTitle": "Exemple non sauvegardé",
+    "btn.settings": "Réglages",
+    "btn.settings.aria": "Ouvrir les réglages et préférences",
+    "modal.settings.title": "Réglages & Préférences",
+    "modal.settings.general": "Général",
+    "modal.settings.autoConnect": "Connexion auto au démarrage",
+    "modal.settings.autoConnectDesc": "Se connecter automatiquement au dernier profil utilisé au lancement.",
+    "modal.btn.close": "Fermer",
   },
 };
 
