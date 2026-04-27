@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2026-04-27
+
+### Added
+- Drag-and-drop support for `.ovpn` profile imports.
+- Settings modal with persistence and auto-connect preference.
+- Internationalized UI strings and enhanced update banner styles.
+
+### Changed
+- Refactored import section: removed URL import modal and simplified styling.
+- Updated documentation with new project screenshot and frontend architecture label.
+
 ## [0.1.3] - 2026-04-27
 
 ### Added
