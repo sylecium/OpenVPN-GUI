@@ -21,7 +21,6 @@
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
               <span class="brand-text" data-i18n="app.title">OpenVPN-GUI</span>
-              <span id="update-badge" class="update-badge hidden" title="Update available">MAJ</span>
             </div>
             <div style="display: flex; gap: 8px;">
               <button
@@ -94,6 +93,21 @@
           <div id="vpn-list" class="vpn-list"></div>
 
           <div class="sidebar-footer">
+            <div id="update-banner" class="update-banner hidden">
+              <div class="update-banner-content">
+                <div class="update-info">
+                  <span class="update-title" data-i18n="update.available">Mise à jour disponible</span>
+                  <span id="update-version" class="update-version">v...</span>
+                </div>
+                <div class="update-actions">
+                  <button id="update-btn-later" class="btn-update-later" data-i18n="btn.later">Plus tard</button>
+                  <button id="update-btn-now" class="btn-update-now" data-i18n="btn.updateNow">Mettre à jour</button>
+                </div>
+              </div>
+              <div id="update-progress-container" class="update-progress-container hidden">
+                <div id="update-progress-bar" class="update-progress-bar"></div>
+              </div>
+            </div>
             <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
           </div>
         </aside>

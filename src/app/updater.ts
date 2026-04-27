@@ -21,19 +21,37 @@ export async function checkForAppUpdate(silent = true): Promise<void> {
 }
 
 function showUpdateUI(version: string): void {
-  const badge = byId<HTMLElement>("update-badge");
-  if (badge) {
-    badge.classList.remove("hidden");
-    badge.title = `Version ${version} available`;
-    badge.onclick = () => {
-      void startUpdateFlow();
-    };
-  }
+  const banner = byId<HTMLElement>("update-banner");
+  const versionSpan = byId<HTMLElement>("update-version");
+  const btnNow = byId<HTMLButtonElement>("update-btn-now");
+  const btnLater = byId<HTMLButtonElement>("update-btn-later");
+
+  if (!banner || !versionSpan || !btnNow || !btnLater) return;
+
+  versionSpan.textContent = `v${version}`;
+  banner.classList.remove("hidden");
+
+  btnNow.onclick = () => {
+    void startUpdateFlow();
+  };
+
+  btnLater.onclick = () => {
+    banner.classList.add("hidden");
+  };
 }
 
 async function startUpdateFlow(): Promise<void> {
   const update = await check();
   if (!update) return;
+
+  const btnNow = byId<HTMLButtonElement>("update-btn-now");
+  const btnLater = byId<HTMLButtonElement>("update-btn-later");
+  const progressContainer = byId<HTMLElement>("update-progress-container");
+  const progressBar = byId<HTMLElement>("update-progress-bar");
+
+  if (btnNow) btnNow.disabled = true;
+  if (btnLater) btnLater.classList.add("hidden");
+  if (progressContainer) progressContainer.classList.remove("hidden");
 
   try {
     setFeedback("Downloading update...", false);
@@ -45,15 +63,18 @@ async function startUpdateFlow(): Promise<void> {
       switch (event.event) {
         case "Started":
           contentLength = event.data.contentLength;
+          if (progressBar) progressBar.style.width = "0%";
           break;
         case "Progress":
           downloaded += event.data.chunkLength;
-          if (contentLength) {
+          if (contentLength && progressBar) {
              const percent = Math.round((downloaded / contentLength) * 100);
+             progressBar.style.width = `${percent}%`;
              setFeedback(`Downloading update: ${percent}%`, false);
           }
           break;
         case "Finished":
+          if (progressBar) progressBar.style.width = "100%";
           setFeedback("Update installed. Restarting...", false);
           break;
       }
@@ -63,5 +84,10 @@ async function startUpdateFlow(): Promise<void> {
   } catch (error) {
     console.error("Update installation failed:", error);
     setFeedback("Update failed. Please try again later.", true);
+    
+    // Reset UI on failure
+    if (btnNow) btnNow.disabled = false;
+    if (btnLater) btnLater.classList.remove("hidden");
+    if (progressContainer) progressContainer.classList.add("hidden");
   }
 }

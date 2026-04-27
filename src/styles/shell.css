@@ -867,27 +867,102 @@ details.vpn-group[open] > .vpn-group-header .vpn-group-icon {
   background: var(--text-muted);
 }
 
-.update-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.update-banner {
+  margin: 12px;
+  background: var(--bg-panel-deep);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: slide-up 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-md);
+}
+
+.update-banner-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.update-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.update-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.update-version {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.update-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-update-now {
+  flex: 1;
   background-color: var(--accent-orange);
   color: white;
-  font-size: 10px;
-  font-weight: bold;
-  padding: 2px 6px;
-  border-radius: 9999px;
-  margin-left: 8px;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.2s;
+}
+
+.btn-update-now:hover {
+  opacity: 0.9;
+}
+
+.btn-update-later {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-update-later:hover {
+  border-color: var(--text-muted);
+  color: var(--text-primary);
+}
+
+.update-progress-container {
+  height: 4px;
+  background: var(--bg-base);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.update-progress-bar {
+  height: 100%;
+  background: var(--accent-orange);
+  width: 0%;
+  transition: width 0.3s ease;
   box-shadow: 0 0 8px var(--accent-orange);
 }
 
-.update-badge:hover {
-  transform: scale(1.1);
-  background-color: #f28240;
+.update-banner.hidden {
+  display: none;
 }
 
-.update-badge.hidden {
-  display: none;
+@keyframes slide-up {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
