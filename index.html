@@ -200,8 +200,8 @@
               <span id="stat-iface"><span data-i18n="stats.interface">Interface</span>: —</span>
             </div>
 
-            <div class="terminal-container">
-              <div class="terminal-wrapper">
+            <details class="terminal-details" open>
+              <summary class="terminal-summary">
                 <div class="terminal-header">
                   <span class="terminal-title" data-i18n="terminal.title">openvpn-gui-daemon · logs</span>
                   <div class="terminal-toolbar" role="group" aria-label="Log actions" data-i18n="terminal.actions.aria">
@@ -210,21 +210,25 @@
                     <button id="refresh-btn" type="button" class="btn-terminal" data-i18n="btn.refresh">Refresh</button>
                   </div>
                 </div>
-                <div class="terminal-body">
-                  <pre id="logs" class="terminal-logs" role="log"></pre>
-                </div>
+              </summary>
+              <div class="terminal-body">
+                <pre id="logs" class="terminal-logs" role="log"></pre>
               </div>
-            </div>
+            </details>
 
-            <section class="history-section" aria-labelledby="history-heading">
-              <div class="history-head">
-                <h2 id="history-heading" data-i18n="history.title">History</h2>
-                <button id="clear-history-btn" type="button" class="btn-history-clear" data-i18n="btn.clearHistory">
-                  Clear history
-                </button>
-              </div>
+
+            <details class="history-details" open>
+              <summary class="history-summary">
+                <div class="history-head">
+                  <h2 id="history-heading" data-i18n="history.title">History</h2>
+                  <button id="clear-history-btn" type="button" class="btn-history-clear" data-i18n="btn.clearHistory">
+                    Clear history
+                  </button>
+                </div>
+              </summary>
               <ul id="history-list" class="history-list"></ul>
-            </section>
+            </details>
+
           </div>
         </main>
       </div>
