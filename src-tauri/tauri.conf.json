@@ -40,11 +40,9 @@
         "depends": [
           "openvpn"
         ],
-        "scripts": {
-          "postinst": "../packaging/debian/postinst",
-          "prerm": "../packaging/debian/prerm",
-          "postrm": "../packaging/debian/postrm"
-        },
+        "postInstallScript": "../packaging/debian/postinst",
+        "preRemoveScript": "../packaging/debian/prerm",
+        "postRemoveScript": "../packaging/debian/postrm",
         "files": {
           "/usr/sbin/openvpn-gui-daemon": "target/release/openvpn-daemon",
           "/etc/systemd/system/openvpn-gui-daemon.service": "../systemd/openvpn-gui-daemon.service"
