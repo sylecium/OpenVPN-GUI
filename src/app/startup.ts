@@ -13,6 +13,7 @@ import { refreshLogs, clearLogsView, copyLogsToClipboard } from "../sync/logs";
 import { refreshTrafficStats } from "../sync/traffic";
 import { initThemeToggle } from "../ui/theme";
 import { setFeedback } from "../ui/feedback";
+import { getVersion } from "@tauri-apps/api/app";
 import { checkForAppUpdate } from "./updater";
 
 function refreshAll(): void {
@@ -53,6 +54,11 @@ function bindVpnListDelegation(): void {
 
 export function bootstrapApp(): void {
   initThemeToggle();
+
+  void getVersion().then((v) => {
+    const el = byId<HTMLElement>("app-version");
+    if (el) el.textContent = `v${v}`;
+  });
 
   byId<HTMLButtonElement>("connect-btn").addEventListener("click", () => {
     void onPowerClick();

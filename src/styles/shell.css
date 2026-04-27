@@ -962,6 +962,26 @@ details.vpn-group[open] > .vpn-group-header .vpn-group-icon {
   display: none;
 }
 
+.sidebar-footer-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 12px 12px;
+}
+
+.app-version {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+}
+
+.feedback {
+  margin: 0;
+  min-height: 1.2em;
+}
+
 @keyframes slide-up {
   from { transform: translateY(10px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
