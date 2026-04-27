@@ -2411,7 +2411,7 @@ checksum = "7c87def4c32ab89d880effc9e097653c8da5d6ef28e6b539d313baaacfbafcbe"
 
 [[package]]
 name = "openvpn-daemon"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "libc",
  "openvpn-ipc",
@@ -2422,7 +2422,7 @@ dependencies = [
 
 [[package]]
 name = "openvpn-gui"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "openvpn-ipc",
  "serde",
@@ -2437,7 +2437,7 @@ dependencies = [
 
 [[package]]
 name = "openvpn-ipc"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "serde",
  "serde_json",
