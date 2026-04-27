@@ -7,7 +7,7 @@
 
 OpenVPN GUI is a modern desktop application built with **Tauri 2** (TypeScript frontend, Rust backend). On Linux, it communicates with a separate **`openvpn-gui-daemon`** service over a **Unix socket**. This architecture ensures that the GUI does not require elevated privileges to manage OpenVPN processes.
 
-![OpenVPN GUI Interface](openvpn-gui-v.0.1.0.png)
+![OpenVPN GUI Interface](openvpn-gui-v.0.1.3.png)
 
 ## Key Features
 
@@ -28,7 +28,7 @@ The application is split into three main components to ensure privilege separati
 ```ansi
 ┌─────────────┐   Tauri IPC    ┌──────────────┐   Unix socket    ┌────────────────────┐
 │  Frontend   │ <────────────> │ Tauri Core   │ <──────────────> │ openvpn-gui-daemon │
-│  (React/TS) │    invoke()    │   (Rust)     │   JSON / Unix    │  (System Service)  │
+│   (TS)      │    invoke()    │   (Rust)     │   JSON / Unix    │  (System Service)  │
 └─────────────┘                └──────────────┘                  └─────────┬──────────┘
                                                                            │ spawns
                                                                            v
