@@ -2,6 +2,7 @@ import * as backend from "../api/backend";
 import { formatHistoryEvent } from "../lib/format";
 import { byId } from "../lib/dom";
 import { setFeedback } from "../ui/feedback";
+import { t, getLocale } from "../i18n";
 
 export async function refreshHistory(): Promise<void> {
   try {
@@ -12,7 +13,7 @@ export async function refreshHistory(): Promise<void> {
     if (history.length === 0) {
       const li = document.createElement("li");
       li.className = "muted";
-      li.textContent = "Aucun événement enregistré";
+      li.textContent = t("history.empty");
       list.append(li);
       return;
     }
@@ -28,7 +29,7 @@ export async function refreshHistory(): Promise<void> {
       const time = document.createElement("time");
       time.className = "history-time";
       time.dateTime = new Date(item.tsUnixMs).toISOString();
-      time.textContent = new Date(item.tsUnixMs).toLocaleString("fr-FR");
+      time.textContent = new Date(item.tsUnixMs).toLocaleString(getLocale());
 
       const eventLabel = document.createElement("span");
       eventLabel.className = "history-event";
@@ -45,7 +46,7 @@ export async function refreshHistory(): Promise<void> {
       if (item.details) {
         parts.push(item.details);
       }
-      body.textContent = parts.length > 0 ? parts.join(" · ") : "Aucun détail";
+      body.textContent = parts.length > 0 ? parts.join(" · ") : t("history.noDetails");
 
       li.append(meta, body);
       list.append(li);
@@ -58,7 +59,7 @@ export async function refreshHistory(): Promise<void> {
 export async function clearHistoryStorage(): Promise<void> {
   try {
     await backend.apiHistoryClear();
-    setFeedback("Historique effacé");
+    setFeedback(t("feedback.historyCleared"));
     await refreshHistory();
   } catch (error) {
     setFeedback(String(error), true);

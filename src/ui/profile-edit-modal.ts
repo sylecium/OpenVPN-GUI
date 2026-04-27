@@ -32,7 +32,7 @@ export function openProfileEditModal(profilePath: string, customDisplay: string,
   pathInput.value = profilePath;
 
   const hint = byId<HTMLElement>("profile-edit-basename-hint");
-  hint.textContent = profilePath ? `File name: ${basename(profilePath)}` : "";
+  hint.textContent = profilePath ? `${t("modal.edit.filenamePrefix")}${basename(profilePath)}` : "";
 
   root.classList.remove("hidden");
   root.setAttribute("aria-hidden", "false");
@@ -61,7 +61,7 @@ async function saveProfileEdits(originalPath: string): Promise<void> {
   const groupTrim = groupInput.value.trim();
 
   if (!newPath) {
-    setFeedback("File path cannot be empty.", true);
+    setFeedback(t("feedback.emptyPath"), true);
     return;
   }
 
@@ -101,7 +101,7 @@ export function bindProfileEditModal(): void {
 
   pathInput.addEventListener("input", () => {
     const p = pathInput.value.trim();
-    hint.textContent = p ? `File name: ${basename(p)}` : "";
+    hint.textContent = p ? `${t("modal.edit.filenamePrefix")}${basename(p)}` : "";
   });
 
   backdrop.addEventListener("click", () => {
@@ -127,7 +127,7 @@ export function bindProfileEditModal(): void {
   openEditor.addEventListener("click", () => {
     const target = pathInput.value.trim();
     if (!target) {
-      setFeedback("No path to open.", true);
+      setFeedback(t("feedback.noPathToOpen"), true);
       return;
     }
     void openPath(target).catch((error: unknown) => {

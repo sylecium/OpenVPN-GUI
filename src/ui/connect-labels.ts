@@ -12,23 +12,23 @@ export function updateConnectLabels(status: VpnStatus): void {
   switch (status) {
     case "idle":
       txt.textContent = t("btn.connect");
-      sub.textContent = "Ready to establish a session.";
+      sub.textContent = t("status.sub.idle");
       btn.setAttribute("aria-pressed", "false");
       break;
     case "connecting":
       txt.textContent = t("status.connecting");
-      sub.textContent = "Negotiating with the server...";
+      sub.textContent = t("status.sub.connecting");
       btn.setAttribute("aria-pressed", "false");
       break;
     case "connected":
       txt.textContent = t("btn.disconnect");
-      sub.textContent = "Active VPN session.";
+      sub.textContent = t("status.sub.connected");
       btn.classList.add("connected");
       btn.setAttribute("aria-pressed", "true");
       break;
     case "error":
       txt.textContent = t("btn.connect");
-      sub.textContent = "Check profile or logs.";
+      sub.textContent = t("status.sub.error");
       btn.setAttribute("aria-pressed", "false");
       break;
     default:

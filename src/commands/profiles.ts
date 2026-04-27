@@ -6,10 +6,11 @@ import { refreshServerMetaForProfile, resetServerMetaEmpty } from "../ui/server-
 import { refreshRecentProfiles, syncVpnSidebarFromProfilePath } from "../sync/profiles";
 import { refreshStatus } from "../sync/status";
 import { session } from "../state/session";
+import { t } from "../i18n";
 
 export async function upsertFromPath(profilePath: string): Promise<void> {
   await backend.apiUpsertRecentProfile(profilePath);
-  setFeedback("Profil enregistré dans la liste");
+  setFeedback(t("feedback.profileSaved"));
   await refreshRecentProfiles();
 }
 
@@ -24,7 +25,7 @@ export async function applyPickedProfile(selectedPath: string): Promise<void> {
     return;
   }
   refreshServerMetaForProfile(selectedPath);
-  setFeedback("Profil sélectionné");
+  setFeedback(t("feedback.profileSelected"));
   syncVpnSidebarFromProfilePath();
 }
 
@@ -36,7 +37,7 @@ export async function browseForProfile(): Promise<void> {
     const selected = await open({
       multiple: false,
       directory: false,
-      title: "Choisir un fichier OpenVPN",
+      title: t("dialog.browseTitle"),
       filters: [{ name: "OpenVPN", extensions: ["ovpn", "conf"] }],
     });
     if (typeof selected === "string") {
@@ -50,7 +51,7 @@ export async function browseForProfile(): Promise<void> {
 export async function removeProfileFromRecents(profilePath: string): Promise<void> {
   try {
     await backend.apiRemoveRecentProfile(profilePath);
-    setFeedback("Profil retiré de la liste");
+    setFeedback(t("feedback.profileRemoved"));
     if (byId<HTMLInputElement>("profile-path").value === profilePath) {
       byId<HTMLInputElement>("profile-path").value = "";
     }
@@ -72,7 +73,7 @@ export function onServerSelectChange(value: string): void {
 
   if (value) {
     refreshServerMetaForProfile(value);
-    setFeedback("Profil sélectionné");
+    setFeedback(t("feedback.profileSelected"));
   } else {
     resetServerMetaEmpty();
   }

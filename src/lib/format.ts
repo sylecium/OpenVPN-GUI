@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import type { VpnStatus } from "../types/ipc";
 import { assertNever } from "./assert";
 
@@ -24,11 +25,11 @@ export function profileDisplayLabel(path: string, displayName?: string | null): 
 export function formatHistoryEvent(event: string): string {
   switch (event) {
     case "connect_requested":
-      return "Connexion demandée";
+      return t("event.connectRequested");
     case "connect_failed":
-      return "Échec de connexion";
+      return t("event.connectFailed");
     case "disconnect_requested":
-      return "Déconnexion demandée";
+      return t("event.disconnectRequested");
     default:
       return event;
   }
@@ -37,13 +38,13 @@ export function formatHistoryEvent(event: string): string {
 export function mapStatusLabel(status: VpnStatus): string {
   switch (status) {
     case "idle":
-      return "Non connecté";
+      return t("status.idle");
     case "connecting":
-      return "Connexion en cours";
+      return t("status.connecting");
     case "connected":
-      return "Connecté";
+      return t("status.connected");
     case "error":
-      return "Erreur";
+      return t("status.error");
     default:
       return assertNever(status);
   }

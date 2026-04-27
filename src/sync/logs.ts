@@ -4,6 +4,7 @@ import { byId } from "../lib/dom";
 import { session } from "../state/session";
 import { setFeedback } from "../ui/feedback";
 import { refreshStatRemoteDisplay } from "../ui/server-meta-view";
+import { t, getLocale } from "../i18n";
 
 /** Nombre max de lignes conservées dans le panneau (évite un DOM trop lourd). */
 const MAX_LOG_LINES_IN_VIEW = 2500;
@@ -43,7 +44,7 @@ export async function refreshLogs(): Promise<void> {
     }
 
     const lines = logs.entries.map((entry) => {
-      const ts = new Date(entry.ts_unix_ms).toLocaleTimeString("fr-FR");
+      const ts = new Date(entry.ts_unix_ms).toLocaleTimeString(getLocale());
       return `[${ts}] ${entry.level.toUpperCase()} ${entry.message}`;
     });
     const existing = panel.textContent ?? "";
@@ -69,20 +70,20 @@ export function clearLogsView(): void {
   if (scrollParent instanceof HTMLElement) {
     scrollParent.scrollTop = 0;
   }
-  setFeedback("Affichage des journaux effacé");
+  setFeedback(t("feedback.logsCleared"));
 }
 
 export async function copyLogsToClipboard(): Promise<void> {
   const panel = byId<HTMLElement>("logs");
   const text = panel.textContent ?? "";
   if (!text.trim()) {
-    setFeedback("Aucun journal à copier", true);
+    setFeedback(t("feedback.noLogsToCopy"), true);
     return;
   }
   try {
     await navigator.clipboard.writeText(text);
-    setFeedback("Journaux copiés dans le presse-papiers");
+    setFeedback(t("feedback.logsCopied"));
   } catch {
-    setFeedback("Copie impossible (permissions)", true);
+    setFeedback(t("feedback.copyFailed"), true);
   }
 }

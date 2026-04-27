@@ -46,6 +46,50 @@ const translations: Record<Language, Dictionary> = {
     "feedback.renamed": "Renamed to ",
     "feedback.saved": "Changes saved.",
     "vpn.unknown": "unknown",
+    "update.available": "Update available",
+    "btn.later": "Later",
+    "btn.updateNow": "Update now",
+    "update.upToDate": "App is up to date.",
+    "update.checkFailed": "Update check failed.",
+    "update.downloading": "Downloading update...",
+    "update.downloadingPerc": "Downloading update: {perc}%",
+    "update.installed": "Update installed. Restarting...",
+    "update.failed": "Update failed. Please try again later.",
+    "feedback.demoHint": "Visual example only: import a real .ovpn file.",
+    "status.sub.idle": "Ready to establish a session.",
+    "status.sub.connecting": "Negotiating with the server...",
+    "status.sub.connected": "Active VPN session.",
+    "status.sub.error": "Check profile or logs.",
+    "stats.protocol": "Protocol",
+    "stats.cipher": "Cipher",
+    "stats.remote": "Remote",
+    "stats.down": "Down",
+    "stats.up": "Up",
+    "stats.totalDown": "Total Down",
+    "stats.totalUp": "Total Up",
+    "feedback.selectProfile": "Please select or import an .ovpn profile",
+    "feedback.profileSaved": "Profile saved to list",
+    "feedback.profileSelected": "Profile selected",
+    "dialog.browseTitle": "Choose an OpenVPN file",
+    "feedback.profileRemoved": "Profile removed from list",
+    "modal.edit.filenamePrefix": "File name: ",
+    "feedback.emptyPath": "File path cannot be empty.",
+    "feedback.noPathToOpen": "No path to open.",
+    "history.empty": "No recorded events",
+    "history.noDetails": "No details",
+    "feedback.historyCleared": "History cleared",
+    "feedback.logsCleared": "Logs view cleared",
+    "feedback.noLogsToCopy": "No logs to copy",
+    "feedback.logsCopied": "Logs copied to clipboard",
+    "feedback.copyFailed": "Failed to copy (permissions)",
+    "event.connectRequested": "Connection requested",
+    "event.connectFailed": "Connection failed",
+    "event.disconnectRequested": "Disconnection requested",
+    "sidebar.dragHint": "Drag and drop to reorder profiles",
+    "status.demo": "Example",
+    "btn.edit.aria": "Edit profile (display name, path)",
+    "btn.remove.aria": "Remove from list",
+    "status.demoTitle": "Unsaved example",
   },
   fr: {
     "app.title": "OpenVPN-GUI",
@@ -90,6 +134,50 @@ const translations: Record<Language, Dictionary> = {
     "feedback.renamed": "Renommé en ",
     "feedback.saved": "Modifications enregistrées.",
     "vpn.unknown": "inconnu",
+    "update.available": "Mise à jour disponible",
+    "btn.later": "Plus tard",
+    "btn.updateNow": "Mettre à jour",
+    "update.upToDate": "L'application est à jour.",
+    "update.checkFailed": "Échec de la vérification de mise à jour.",
+    "update.downloading": "Téléchargement de la mise à jour...",
+    "update.downloadingPerc": "Téléchargement : {perc}%",
+    "update.installed": "Mise à jour installée. Redémarrage...",
+    "update.failed": "Échec de la mise à jour. Veuillez réessayer plus tard.",
+    "feedback.demoHint": "Exemple visuel uniquement : importez un fichier .ovpn réel.",
+    "status.sub.idle": "Prêt à établir une session.",
+    "status.sub.connecting": "Négociation avec le serveur...",
+    "status.sub.connected": "Session VPN active.",
+    "status.sub.error": "Vérifiez le profil ou les journaux.",
+    "stats.protocol": "Protocole",
+    "stats.cipher": "Chiffrement",
+    "stats.remote": "Distant",
+    "stats.down": "Descendant",
+    "stats.up": "Ascendant",
+    "stats.totalDown": "Total Reçu",
+    "stats.totalUp": "Total Envoyé",
+    "feedback.selectProfile": "Choisissez ou importez un profil .ovpn",
+    "feedback.profileSaved": "Profil enregistré dans la liste",
+    "feedback.profileSelected": "Profil sélectionné",
+    "dialog.browseTitle": "Choisir un fichier OpenVPN",
+    "feedback.profileRemoved": "Profil retiré de la liste",
+    "modal.edit.filenamePrefix": "Nom du fichier : ",
+    "feedback.emptyPath": "Le chemin du fichier ne peut pas être vide.",
+    "feedback.noPathToOpen": "Aucun chemin à ouvrir.",
+    "history.empty": "Aucun événement enregistré",
+    "history.noDetails": "Aucun détail",
+    "feedback.historyCleared": "Historique effacé",
+    "feedback.logsCleared": "Affichage des journaux effacé",
+    "feedback.noLogsToCopy": "Aucun journal à copier",
+    "feedback.logsCopied": "Journaux copiés dans le presse-papiers",
+    "feedback.copyFailed": "Copie impossible (permissions)",
+    "event.connectRequested": "Connexion demandée",
+    "event.connectFailed": "Échec de connexion",
+    "event.disconnectRequested": "Déconnexion demandée",
+    "sidebar.dragHint": "Glisser-déposer pour réorganiser les profils",
+    "status.demo": "Exemple",
+    "btn.edit.aria": "Modifier le profil (nom affiché, chemin)",
+    "btn.remove.aria": "Retirer de la liste",
+    "status.demoTitle": "Exemple non sauvegardé",
   },
 };
 
@@ -118,8 +206,18 @@ export function toggleLanguage(): void {
   updateLangButton();
 }
 
-export function t(key: string): string {
-  return translations[currentLang][key] || key;
+export function getLocale(): string {
+  return currentLang === "fr" ? "fr-FR" : "en-US";
+}
+
+export function t(key: string, params?: Record<string, string>): string {
+  let text = translations[currentLang][key] || key;
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      text = text.replace(`{${k}}`, v);
+    }
+  }
+  return text;
 }
 
 export function applyTranslations(): void {

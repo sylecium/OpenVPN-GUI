@@ -69,7 +69,7 @@ export function createVpnSidebarRow(profile: {
   } else {
     li.dataset.path = profile.path;
     li.draggable = true;
-    li.title = "Drag and drop to reorder profiles";
+    li.title = t("sidebar.dragHint");
   }
 
   const left = document.createElement("div");
@@ -83,7 +83,7 @@ export function createVpnSidebarRow(profile: {
   name.textContent = profileDisplayLabel(profile.path, profile.displayName);
   const statusText = document.createElement("span");
   statusText.className = "vpn-status-text";
-  statusText.textContent = profile.isDemo ? "Example" : t("status.idle");
+  statusText.textContent = profile.isDemo ? t("status.demo") : t("status.idle");
   info.append(name, statusText);
   left.append(info);
 
@@ -95,11 +95,11 @@ export function createVpnSidebarRow(profile: {
   editBtn.draggable = false;
   editBtn.className = "row-action row-action--edit";
   editBtn.dataset.ovpnAction = "edit";
-  editBtn.setAttribute("aria-label", "Edit profile (display name, path)");
+  editBtn.setAttribute("aria-label", t("btn.edit.aria"));
   editBtn.append(pencilIcon());
   if (profile.isDemo) {
     editBtn.disabled = true;
-    editBtn.title = "Unsaved example";
+    editBtn.title = t("status.demoTitle");
   } else {
     editBtn.dataset.path = profile.path;
     const custom = profile.displayName?.trim();
@@ -117,11 +117,11 @@ export function createVpnSidebarRow(profile: {
   delBtn.draggable = false;
   delBtn.className = "row-action row-action--remove";
   delBtn.dataset.ovpnAction = "remove";
-  delBtn.setAttribute("aria-label", "Remove from list");
+  delBtn.setAttribute("aria-label", t("btn.remove.aria"));
   delBtn.append(trashIcon());
   if (profile.isDemo) {
     delBtn.disabled = true;
-    delBtn.title = "Unsaved example";
+    delBtn.title = t("status.demoTitle");
   } else {
     delBtn.dataset.path = profile.path;
   }

@@ -13,6 +13,7 @@ import { refreshLogs, clearLogsView, copyLogsToClipboard } from "../sync/logs";
 import { refreshTrafficStats } from "../sync/traffic";
 import { initThemeToggle } from "../ui/theme";
 import { setFeedback } from "../ui/feedback";
+import { initI18n, toggleLanguage, t } from "../i18n";
 import { getVersion } from "@tauri-apps/api/app";
 import { checkForAppUpdate } from "./updater";
 
@@ -47,7 +48,7 @@ function bindVpnListDelegation(): void {
       return;
     }
     if (target.closest(".vpn-item--demo")) {
-      setFeedback("Visual example only: import a real .ovpn file.", true);
+      setFeedback(t("feedback.demoHint"), true);
     }
   });
 }

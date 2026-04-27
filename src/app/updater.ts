@@ -2,6 +2,7 @@ import { check } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { byId } from "../lib/dom";
 import { setFeedback } from "../ui/feedback";
+import { t } from "../i18n";
 
 export async function checkForAppUpdate(silent = true): Promise<void> {
   try {
@@ -10,12 +11,12 @@ export async function checkForAppUpdate(silent = true): Promise<void> {
       console.log(`Update found: ${update.version}`);
       showUpdateUI(update.version);
     } else if (!silent) {
-      setFeedback("App is up to date.", false);
+      setFeedback(t("update.upToDate"), false);
     }
   } catch (error) {
     console.error("Failed to check for updates:", error);
     if (!silent) {
-      setFeedback("Update check failed.", true);
+      setFeedback(t("update.checkFailed"), true);
     }
   }
 }
@@ -54,7 +55,7 @@ async function startUpdateFlow(): Promise<void> {
   if (progressContainer) progressContainer.classList.remove("hidden");
 
   try {
-    setFeedback("Downloading update...", false);
+    setFeedback(t("update.downloading"), false);
     
     let downloaded = 0;
     let contentLength: number | undefined = 0;
@@ -70,12 +71,12 @@ async function startUpdateFlow(): Promise<void> {
           if (contentLength && progressBar) {
              const percent = Math.round((downloaded / contentLength) * 100);
              progressBar.style.width = `${percent}%`;
-             setFeedback(`Downloading update: ${percent}%`, false);
+             setFeedback(t("update.downloadingPerc", { perc: percent.toString() }), false);
           }
           break;
         case "Finished":
           if (progressBar) progressBar.style.width = "100%";
-          setFeedback("Update installed. Restarting...", false);
+          setFeedback(t("update.installed"), false);
           break;
       }
     });
@@ -83,7 +84,7 @@ async function startUpdateFlow(): Promise<void> {
     await relaunch();
   } catch (error) {
     console.error("Update installation failed:", error);
-    setFeedback("Update failed. Please try again later.", true);
+    setFeedback(t("update.failed"), true);
     
     // Reset UI on failure
     if (btnNow) btnNow.disabled = false;

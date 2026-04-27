@@ -5,6 +5,7 @@ import { refreshRecentProfiles } from "../sync/profiles";
 import { refreshHistory } from "../sync/history";
 import { refreshStatus } from "../sync/status";
 import { byId } from "../lib/dom";
+import { t } from "../i18n";
 
 export async function connect(): Promise<void> {
   if (session.isBusy) {
@@ -12,7 +13,7 @@ export async function connect(): Promise<void> {
   }
   const profilePath = byId<HTMLInputElement>("profile-path").value.trim();
   if (!profilePath) {
-    setFeedback("Choisissez ou importez un profil .ovpn", true);
+    setFeedback(t("feedback.selectProfile"), true);
     return;
   }
 
