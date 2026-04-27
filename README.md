@@ -13,11 +13,13 @@ OpenVPN GUI is a modern desktop application built with **Tauri 2** (TypeScript f
 
 - **Secure Profile Management**: Import and manage `.ovpn` profiles with custom display names and folder-based grouping.
 - **Advanced Organization**: Support for **drag-and-drop** reordering of profiles and groups.
-- **Real-time Monitoring**: Live OpenVPN log streaming with integrated terminal controls.
+- **Real-time Monitoring**: Live OpenVPN log streaming with integrated terminal controls and a premium status indicator.
+- **Collapsible Workspace**: Foldable logs and history sections to focus on what matters.
 - **Traffic Statistics**: Instant bitrate and session-total data (download/upload) captured via `/proc/net/dev` for `tun`/`tap` interfaces.
-- **Persistence**: Remembers group collapse states and session traffic totals across application restarts.
+- **Auto-Update**: Seamlessly stay up to date with built-in version checking and automated installation.
 - **Session History**: Persistent event log tracking connection attempts and status changes.
-- **Modern UI**: Responsive design with high-contrast **light** and **dark** modes.
+- **Modern UI**: Responsive design with high-contrast **light** and **dark** modes, featuring subtle animations for a premium feel.
+
 
 ## Architecture
 
@@ -60,13 +62,13 @@ The recommended way to install OpenVPN GUI is using the pre-built packages avail
 Download the `.deb` package and install it using `apt` (which handles dependencies automatically):
 ```bash
 sudo apt update
-sudo apt install ./openvpn-gui_0.1.1_amd64.deb
+sudo apt install ./openvpn-gui_0.1.3_amd64.deb
 ```
 
 #### Fedora / RHEL / CentOS (`.rpm`)
 Download the `.rpm` package and install it using `dnf`:
 ```bash
-sudo dnf install ./openvpn-gui-0.1.1-1.x86_64.rpm
+sudo dnf install ./openvpn-gui-0.1.3-1.x86_64.rpm
 ```
 
 > **Note**: The packages automatically handle the installation of the `openvpn-gui-daemon` binary, the systemd service configuration, and the initial setup of the communication socket.
