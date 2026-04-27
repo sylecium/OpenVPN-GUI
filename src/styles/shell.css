@@ -92,10 +92,12 @@
 
 .import-section {
   padding: 16px 16px 12px;
+  display: flex;
+  gap: 8px;
 }
 
 .import-btn {
-  width: 100%;
+  flex: 1;
   min-height: var(--touch-min);
   padding: 10px 12px;
   background: var(--surface-bg);
@@ -109,6 +111,25 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+}
+
+.import-btn-secondary {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  background: var(--surface-bg);
+  border: 1px dashed var(--surface-border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.import-btn-secondary:hover:not(:disabled) {
+  border-color: var(--text-secondary);
+  background: var(--surface-hover);
 }
 
 .import-btn:hover:not(:disabled) {
@@ -1126,4 +1147,44 @@ details.vpn-group[open]>.vpn-group-header .vpn-group-icon {
     transform: translateY(0);
     opacity: 1;
   }
+.drag-drop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.drag-drop-overlay:not(.hidden) {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.drag-drop-overlay__content {
+  background: var(--surface-bg);
+  border: 2px dashed var(--accent);
+  padding: 40px;
+  border-radius: var(--radius-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-primary);
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.drag-drop-overlay:not(.hidden) .drag-drop-overlay__content {
+  transform: translateY(0);
+}
+
+.drag-drop-overlay svg {
+  stroke: var(--accent);
+}
 }

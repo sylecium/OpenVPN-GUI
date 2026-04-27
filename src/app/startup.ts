@@ -20,6 +20,8 @@ import * as settings from "../lib/settings";
 import { session } from "../state/session";
 import { getVersion } from "@tauri-apps/api/app";
 import { checkForAppUpdate } from "./updater";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { applyPickedProfile } from "../commands/profiles";
 
 function refreshAll(): void {
   void refreshStatus();
@@ -91,6 +93,25 @@ export function bootstrapApp(): void {
   bindVpnListDelegation();
   bindProfileEditModal();
   bindSettingsModal();
+
+  const appWindow = getCurrentWindow();
+  void appWindow.onDragDropEvent((event) => {
+    const overlay = byId<HTMLElement>("drag-drop-overlay");
+    if (event.payload.type === "enter") {
+      overlay.classList.remove("hidden");
+    } else if (event.payload.type === "leave") {
+      overlay.classList.add("hidden");
+    } else if (event.payload.type === "drop") {
+      overlay.classList.add("hidden");
+      const paths = event.payload.paths;
+      if (paths.length > 0) {
+        const path = paths[0];
+        if (path.endsWith(".ovpn") || path.endsWith(".conf")) {
+          void applyPickedProfile(path);
+        }
+      }
+    }
+  });
 
   const settingsBtn = byId<HTMLButtonElement>("settings-btn");
   if (settingsBtn) {

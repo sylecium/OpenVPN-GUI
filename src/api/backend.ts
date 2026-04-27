@@ -27,7 +27,7 @@ export async function apiVpnIfaceTraffic(): Promise<VpnIfaceTraffic> {
   return invoke<VpnIfaceTraffic>("vpn_iface_traffic");
 }
 
-/** Première directive `remote` du fichier (host:port, port par défaut 1194 si absent). */
+/** Première directive `remote` du fichier (host:port, par défaut 1194 si absent). */
 export async function apiOvpnRemoteHint(profilePath: string): Promise<string> {
   return invoke<string>("ovpn_remote_hint", { profilePath });
 }
