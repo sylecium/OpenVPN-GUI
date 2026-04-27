@@ -63,7 +63,6 @@ export function syncProfileStatusIndicator(): void {
 export async function refreshStatus(): Promise<void> {
   try {
     const status = await backend.apiVpnStatus();
-    const prevStatus = session.lastKnownStatus;
     
     session.lastKnownStatus = status.status;
     session.lastActiveProfile = status.activeProfile ?? null;
