@@ -7,7 +7,7 @@ import { refreshStatRemoteDisplay } from "../ui/server-meta-view";
 import { t, getLocale } from "../i18n";
 
 /** Nombre max de lignes conservées dans le panneau (évite un DOM trop lourd). */
-const MAX_LOG_LINES_IN_VIEW = 2500;
+const MAX_LOG_LINES_IN_VIEW = 500;
 
 function mergeAndCapLogText(existing: string, block: string): string {
   const combined = existing ? `${existing}\n${block}` : block;

@@ -1,6 +1,6 @@
 [package]
 name = "openvpn-gui"
-version = "0.1.4"
+version = "0.2.0"
 description = "Tauri desktop shell: OpenVPN profile UI, daemon IPC client, recents/history, Linux tun/tap traffic from /proc/net/dev."
 authors = ["OpenVPN-GUI contributors"]
 license = "MIT"
@@ -25,6 +25,13 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
+
+[profile.release]
+lto = true            # Link-Time Optimization: reduces binary size ~20-30%
+codegen-units = 1     # Single codegen unit: better LLVM optimisation (slower build)
+strip = true          # Remove debug symbols: reduces RSS
+panic = "abort"       # No stack unwinding code: smaller binary
+opt-level = "s"       # Optimise for size (good trade-off for a desktop app)
 
 [dependencies]
 tauri = { version = "2", features = [] }

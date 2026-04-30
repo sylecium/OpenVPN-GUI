@@ -27,4 +27,17 @@ export default defineConfig(async () => ({
       ignored: ["**/src-tauri/**"],
     },
   },
+  build: {
+    // WebKitGTK always ships a recent engine — no need to transpile for old targets
+    target: "esnext",
+    // Use esbuild for fast, efficient minification
+    minify: "esbuild",
+    cssMinify: true,
+    rollupOptions: {
+      output: {
+        // Single chunk is optimal for a Tauri SPA: no async import overhead
+        manualChunks: undefined,
+      },
+    },
+  },
 }));

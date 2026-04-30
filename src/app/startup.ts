@@ -148,13 +148,52 @@ export async function runInitialSync(): Promise<void> {
   }
 }
 
+/**
+ * Adaptive polling scheduler.
+ *
+ * Intervals by VPN status:
+ *  - idle      : status every 8 s, traffic OFF (zero IPC calls)
+ *  - connecting: status every 1.5 s, traffic OFF
+ *  - connected : status+logs every 3 s, traffic every 2 s
+ *  - error     : status every 5 s, traffic OFF
+ *
+ * Using recursive setTimeout instead of setInterval so that overlapping calls
+ * cannot pile up when an IPC round-trip takes longer than the interval.
+ */
 export function startIntervals(): void {
-  window.setInterval(() => {
-    void refreshStatus().then(() => refreshLogs());
-  }, 1800);
+  function statusDelay(): number {
+    switch (session.lastKnownStatus) {
+      case "connected":   return 3000;
+      case "connecting":  return 1500;
+      case "error":       return 5000;
+      default:            return 8000; // idle
+    }
+  }
 
-  window.setInterval(() => {
-    void refreshTrafficStats();
-  }, 1000);
+  function trafficActive(): boolean {
+    return session.lastKnownStatus === "connected";
+  }
 
+  function scheduleStatus(): void {
+    setTimeout(async () => {
+      await refreshStatus();
+      if (session.lastKnownStatus === "connected") {
+        await refreshLogs();
+      }
+      scheduleStatus();
+    }, statusDelay());
+  }
+
+  function scheduleTraffic(): void {
+    setTimeout(async () => {
+      if (trafficActive()) {
+        await refreshTrafficStats();
+      }
+      // Re-check every 2 s whether traffic polling should run
+      scheduleTraffic();
+    }, 2000);
+  }
+
+  scheduleStatus();
+  scheduleTraffic();
 }
