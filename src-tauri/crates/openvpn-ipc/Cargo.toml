@@ -1,6 +1,6 @@
 [package]
 name = "openvpn-ipc"
-version = "0.1.4"
+version = "0.2.0"
 description = "Shared IPC types: commands (connect, disconnect, status, logs) and JSON-serializable responses for the GUI–daemon Unix socket protocol."
 license = "MIT"
 edition = "2021"

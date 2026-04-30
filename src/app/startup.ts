@@ -149,51 +149,37 @@ export async function runInitialSync(): Promise<void> {
 }
 
 /**
- * Adaptive polling scheduler.
+ * Adaptive polling scheduler — single unified loop.
  *
  * Intervals by VPN status:
- *  - idle      : status every 8 s, traffic OFF (zero IPC calls)
- *  - connecting: status every 1.5 s, traffic OFF
- *  - connected : status+logs every 3 s, traffic every 2 s
- *  - error     : status every 5 s, traffic OFF
+ *  - idle / error : status every 8 s, NO traffic IPC call
+ *  - connecting   : status every 1.5 s, NO traffic IPC call
+ *  - connected    : status + logs + traffic every 3 s
  *
- * Using recursive setTimeout instead of setInterval so that overlapping calls
- * cannot pile up when an IPC round-trip takes longer than the interval.
+ * A single recursive setTimeout replaces two independent setInterval loops.
+ * When idle the JS engine can sleep for the full 8 s between wakeups instead
+ * of waking every 2 s for the old separate traffic timer.
  */
 export function startIntervals(): void {
-  function statusDelay(): number {
+  function delay(): number {
     switch (session.lastKnownStatus) {
-      case "connected":   return 3000;
-      case "connecting":  return 1500;
-      case "error":       return 5000;
-      default:            return 8000; // idle
+      case "connected":  return 3000;
+      case "connecting": return 1500;
+      case "error":      return 5000;
+      default:           return 8000; // idle — long sleep, no traffic call
     }
   }
 
-  function trafficActive(): boolean {
-    return session.lastKnownStatus === "connected";
-  }
-
-  function scheduleStatus(): void {
+  function tick(): void {
     setTimeout(async () => {
       await refreshStatus();
       if (session.lastKnownStatus === "connected") {
         await refreshLogs();
-      }
-      scheduleStatus();
-    }, statusDelay());
-  }
-
-  function scheduleTraffic(): void {
-    setTimeout(async () => {
-      if (trafficActive()) {
         await refreshTrafficStats();
       }
-      // Re-check every 2 s whether traffic polling should run
-      scheduleTraffic();
-    }, 2000);
+      tick();
+    }, delay());
   }
 
-  scheduleStatus();
-  scheduleTraffic();
+  tick();
 }

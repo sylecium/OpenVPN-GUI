@@ -282,6 +282,7 @@
               id="profile-edit-display-name"
               type="text"
               autocomplete="off"
+              spellcheck="false"
               placeholder="Leave empty to use filename"
               data-i18n="modal.edit.displayNamePlaceholder"
             />
@@ -292,13 +293,14 @@
               id="profile-edit-group"
               type="text"
               autocomplete="off"
+              spellcheck="false"
               placeholder="Folder name (leave empty for root)"
               data-i18n="modal.edit.groupPlaceholder"
             />
           </div>
           <div class="profile-edit-modal__field">
             <label for="profile-edit-file-path" data-i18n="modal.edit.filePath">File path</label>
-            <input id="profile-edit-file-path" class="profile-edit-modal__path-input" type="text" spellcheck="false" />
+            <input id="profile-edit-file-path" class="profile-edit-modal__path-input" type="text" spellcheck="false" autocorrect="off" autocapitalize="off" />
           </div>
           <p id="profile-edit-basename-hint" class="profile-edit-modal__hint"></p>
           <div class="profile-edit-modal__actions">

@@ -1121,17 +1121,18 @@ details.vpn-group[open]>.vpn-group-header .vpn-group-icon {
     transform: translateY(10px);
     opacity: 0;
   }
-
   to {
     transform: translateY(0);
     opacity: 1;
   }
+}
+
 .drag-drop-overlay {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(8px);
+  /* No backdrop-filter: avoids a permanent GPU compositing layer */
+  background: rgba(0, 0, 0, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1166,4 +1167,9 @@ details.vpn-group[open]>.vpn-group-header .vpn-group-icon {
 .drag-drop-overlay svg {
   stroke: var(--accent);
 }
+
+/* Skip layout/paint for the history section when off-screen */
+.history-details {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 200px;
 }
