@@ -1,6 +1,6 @@
 [package]
 name = "openvpn-gui"
-version = "0.2.0"
+version = "0.2.1"
 description = "Tauri desktop shell: OpenVPN profile UI, daemon IPC client, recents/history, Linux tun/tap traffic from /proc/net/dev."
 authors = ["OpenVPN-GUI contributors"]
 license = "MIT"

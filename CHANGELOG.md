@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-04-30
+
+### Performance
+- **Optimized Log Rendering**: switched from full `textContent` replacement to individual `TextNode` insertion. Prevents expensive string splitting and full layout recalculation for the entire 500-line log buffer on every update.
+- **CSS Layout Isolation**: applied `contain: layout` to the sidebar, stats cards, and terminal. This allows WebKit to isolate rendering updates to specific regions, significantly reducing global layout costs.
+- **GPU-accelerated Status Wave**: removed CPU-bound `box-shadow` animation from the online status indicator. The animation is now 100% GPU-driven using only `transform` and `opacity`.
+- **Render-skipping with `content-visibility`**: added `content-visibility: auto` to the history section to skip layout/paint when it's outside the viewport.
+- **Woff2-only Fonts**: optimized font loading by removing legacy `.woff` fallback declarations and sticking to modern `.woff2` files (natively supported by WebKitGTK 2.x).
+
 ## [0.2.0] - 2026-04-30
 
 ### Performance

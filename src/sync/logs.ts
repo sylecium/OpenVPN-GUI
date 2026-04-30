@@ -9,14 +9,7 @@ import { t, getLocale } from "../i18n";
 /** Nombre max de lignes conservées dans le panneau (évite un DOM trop lourd). */
 const MAX_LOG_LINES_IN_VIEW = 500;
 
-function mergeAndCapLogText(existing: string, block: string): string {
-  const combined = existing ? `${existing}\n${block}` : block;
-  const lines = combined.split("\n");
-  if (lines.length <= MAX_LOG_LINES_IN_VIEW) {
-    return combined;
-  }
-  return lines.slice(-MAX_LOG_LINES_IN_VIEW).join("\n");
-}
+
 
 export async function refreshLogs(): Promise<void> {
   try {
@@ -27,13 +20,18 @@ export async function refreshLogs(): Promise<void> {
     }
 
     const panel = byId<HTMLElement>("logs");
+    if (!panel) return;
+
     const scrollParent = panel.closest(".terminal-body");
     const wasPinnedToBottom =
       scrollParent instanceof HTMLElement
         ? scrollParent.scrollHeight - scrollParent.scrollTop - scrollParent.clientHeight < 48
         : true;
 
+    // Build log lines fragments
+    const fragment = document.createDocumentFragment();
     for (const entry of logs.entries) {
+      // 1. Extract remote metadata if present
       const extracted = extractRemoteEndpointFromOvpnLogLine(entry.message);
       if (extracted && session.lastActiveProfile != null) {
         session.lastRemoteFromLogs = {
@@ -41,19 +39,25 @@ export async function refreshLogs(): Promise<void> {
           endpoint: extracted,
         };
       }
+
+      // 2. Format line
+      const ts = new Date(entry.ts_unix_ms).toLocaleTimeString(getLocale());
+      const lineText = `[${ts}] ${entry.level.toUpperCase()} ${entry.message}\n`;
+      fragment.appendChild(document.createTextNode(lineText));
     }
 
-    const lines = logs.entries.map((entry) => {
-      const ts = new Date(entry.ts_unix_ms).toLocaleTimeString(getLocale());
-      return `[${ts}] ${entry.level.toUpperCase()} ${entry.message}`;
-    });
-    const existing = panel.textContent ?? "";
-    panel.textContent = mergeAndCapLogText(existing, lines.join("\n"));
+    // 3. Append to DOM
+    panel.appendChild(fragment);
 
-    if (scrollParent instanceof HTMLElement) {
-      if (wasPinnedToBottom) {
-        scrollParent.scrollTop = scrollParent.scrollHeight;
-      }
+    // 4. Cap the log buffer (remove oldest TextNodes if too many lines)
+    // textNodes are siblings in the <pre> block
+    while (panel.childNodes.length > MAX_LOG_LINES_IN_VIEW) {
+      panel.removeChild(panel.firstChild!);
+    }
+
+    // 5. Autoscroll
+    if (scrollParent instanceof HTMLElement && wasPinnedToBottom) {
+      scrollParent.scrollTop = scrollParent.scrollHeight;
     }
 
     refreshStatRemoteDisplay();
