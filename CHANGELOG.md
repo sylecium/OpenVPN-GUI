@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-04-30
+
+### Performance
+- **Adaptive polling scheduler**: replaced fixed `setInterval` loops with recursive `setTimeout`-based adaptive polling. When VPN is idle: status every 8 s, traffic polling completely suspended. When connecting: status every 1.5 s. When connected: status+logs every 3 s, traffic every 2 s. Reduces JS engine activity and allows WebKitGTK to GC more aggressively.
+- **Local font bundling**: replaced Google Fonts CDN import with `@fontsource/inter` and `@fontsource/jetbrains-mono` (latin subset). Eliminates network requests from the WebKit process and removes the persistent HTTP connection kept open for font loading.
+- **Reduced DOM log buffer**: capped visible log lines at 500 (was 2 500) to reduce `<pre>` node pressure on the WebKit layout engine.
+- **Cargo release profile**: added `[profile.release]` with `lto = true`, `codegen-units = 1`, `strip = true`, `panic = "abort"`, `opt-level = "s"` to reduce binary size and RSS of the Rust process.
+- **Disabled `withGlobalTauri`**: set to `false` to avoid injecting the entire Tauri JS API into the global heap (no `window.__TAURI__` usage in the codebase).
+- **Content Security Policy**: enabled strict CSP (`default-src 'self'`) to prevent unintended external resource loads by WebKit.
+- **Vite build optimisation**: added `target: 'esnext'`, `minify: 'esbuild'`, and `cssMinify: true`; CSS bundle reduced from 57.8 kB to 27.2 kB (−53 %).
+
 ## [0.1.4] - 2026-04-27
 
 ### Added
