@@ -59,7 +59,7 @@ export async function disconnect(): Promise<void> {
 }
 
 export async function onPowerClick(): Promise<void> {
-  if (session.lastKnownStatus === "connected") {
+  if (session.lastKnownStatus === "connected" || session.lastKnownStatus === "connecting") {
     await disconnect();
   } else {
     await connect();

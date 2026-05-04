@@ -14,22 +14,26 @@ export function updateConnectLabels(status: VpnStatus): void {
       txt.textContent = t("btn.connect");
       sub.textContent = t("status.sub.idle");
       btn.setAttribute("aria-pressed", "false");
+      btn.removeAttribute("title");
       break;
     case "connecting":
       txt.textContent = t("status.connecting");
       sub.textContent = t("status.sub.connecting");
       btn.setAttribute("aria-pressed", "false");
+      btn.title = t("btn.cancel");
       break;
     case "connected":
       txt.textContent = t("btn.disconnect");
       sub.textContent = t("status.sub.connected");
       btn.classList.add("connected");
       btn.setAttribute("aria-pressed", "true");
+      btn.removeAttribute("title");
       break;
     case "error":
       txt.textContent = t("btn.connect");
       sub.textContent = t("status.sub.error");
       btn.setAttribute("aria-pressed", "false");
+      btn.removeAttribute("title");
       break;
     default:
       assertNever(status);
