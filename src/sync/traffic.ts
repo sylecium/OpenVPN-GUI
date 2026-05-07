@@ -109,14 +109,14 @@ export async function refreshTrafficStats(): Promise<void> {
 
     if (validRate) {
       // Premier échantillon valide : initialiser l'EWMA
-      if (session.smoothedRxBps === null) {
+      if (session.smoothedRxBps === null || session.smoothedTxBps === null) {
         session.smoothedRxBps = currentDrx;
         session.smoothedTxBps = currentDtx;
       } else {
         session.smoothedRxBps = ALPHA * currentDrx + (1 - ALPHA) * session.smoothedRxBps;
         session.smoothedTxBps = ALPHA * currentDtx + (1 - ALPHA) * session.smoothedTxBps;
       }
-    } else if (session.smoothedRxBps === null) {
+    } else if (session.smoothedRxBps === null || session.smoothedTxBps === null) {
       // Connexion active mais pas encore de delta mesurable : afficher 0
       session.smoothedRxBps = 0;
       session.smoothedTxBps = 0;
