@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2026-05-07
+
+### Fixed
+- **Bitrate display always visible when connected**: the RX/TX speed indicators previously flickered or showed `—` because only the instantaneous delta between two consecutive samples was displayed. A first polling cycle produced no measurable delta, leaving the field blank. Fixed by introducing an Exponentially Weighted Moving Average (EWMA, α = 0.4) stored in the session state. The smoothed value is initialised to `0 B/s` on the very first connected sample (instead of `—`), then updated each cycle. This ensures the bitrate is always readable and stable, with no blank flicker between cycles.
+
 ## [0.2.1] - 2026-04-30
 
 ### Performance

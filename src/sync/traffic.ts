@@ -26,6 +26,8 @@ export async function refreshTrafficStats(): Promise<void> {
 
   if (session.lastKnownStatus !== "connected") {
     session.lastTrafficSample = null;
+    session.smoothedRxBps = null;
+    session.smoothedTxBps = null;
     if (session.sessionTrafficBase !== null) {
       // La session vient de se terminer : on efface la base persistée
       clearSessionTrafficBase();
@@ -99,13 +101,32 @@ export async function refreshTrafficStats(): Promise<void> {
     ifaceEl.textContent =
       sample.iface === "—" ? `${t("stats.interface")}: ${t("stats.interface.none")}` : `${t("stats.interface")}: ${sample.iface}`;
 
+    /**
+     * Coefficient de lissage EWMA.  0.4 = bon équilibre réactivité / lisibilité.
+     * Un α plus faible (ex. 0.2) lisse davantage ; plus élevé (ex. 0.6) réagit plus vite.
+     */
+    const ALPHA = 0.4;
+
     if (validRate) {
-      downEl.textContent = formatBitrate(currentDrx);
-      upEl.textContent = formatBitrate(currentDtx);
-    } else {
-      downEl.textContent = "—";
-      upEl.textContent = "—";
+      // Premier échantillon valide : initialiser l'EWMA
+      if (session.smoothedRxBps === null) {
+        session.smoothedRxBps = currentDrx;
+        session.smoothedTxBps = currentDtx;
+      } else {
+        session.smoothedRxBps = ALPHA * currentDrx + (1 - ALPHA) * session.smoothedRxBps;
+        session.smoothedTxBps = ALPHA * currentDtx + (1 - ALPHA) * session.smoothedTxBps;
+      }
+    } else if (session.smoothedRxBps === null) {
+      // Connexion active mais pas encore de delta mesurable : afficher 0
+      session.smoothedRxBps = 0;
+      session.smoothedTxBps = 0;
     }
+    // Si !validRate mais EWMA déjà initialisé, on garde la dernière valeur
+    // (ce cas ne devrait pas arriver avec un dt normal, mais protège contre
+    // un écart de temps trop court entre deux appels).
+
+    downEl.textContent = formatBitrate(session.smoothedRxBps ?? 0);
+    upEl.textContent   = formatBitrate(session.smoothedTxBps ?? 0);
 
     // Calculate and display session total
     const sessionRx = sample.rxBytes - session.sessionTrafficBase.rx;

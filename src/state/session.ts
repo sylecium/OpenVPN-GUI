@@ -13,4 +13,10 @@ export const session = {
   lastTrafficSample: null as { t: number; rx: number; tx: number } | null,
   /** Valeurs initiales de la session pour calculer le total (RX/TX au moment de la connexion). */
   sessionTrafficBase: null as { rx: number; tx: number } | null,
+  /**
+   * Débit lissé (EWMA) en octets/s.  null = pas encore initialisé (connexion active
+   * mais premier échantillon non encore reçu).
+   */
+  smoothedRxBps: null as number | null,
+  smoothedTxBps: null as number | null,
 };
