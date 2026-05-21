@@ -8,6 +8,20 @@
     "opener:default",
     "dialog:default",
     "updater:default",
-    "process:allow-restart"
+    "process:allow-restart",
+    "allow-vpn-connect",
+    "allow-vpn-disconnect",
+    "allow-vpn-status",
+    "allow-vpn-logs",
+    "allow-vpn-iface-traffic",
+    "allow-ovpn-remote-hint",
+    "allow-recent-profiles",
+    "allow-reorder-recent-profiles",
+    "allow-upsert-recent-profile",
+    "allow-remove-recent-profile",
+    "allow-history-entries",
+    "allow-history-clear",
+    "allow-set-profile-metadata",
+    "allow-rename-profile-file"
   ]
 }

@@ -1,0 +1,69 @@
+[[permission]]
+identifier = "allow-vpn-connect"
+description = "Allows invoking the vpn_connect command"
+commands.allow = ["vpn_connect"]
+
+[[permission]]
+identifier = "allow-vpn-disconnect"
+description = "Allows invoking the vpn_disconnect command"
+commands.allow = ["vpn_disconnect"]
+
+[[permission]]
+identifier = "allow-vpn-status"
+description = "Allows invoking the vpn_status command"
+commands.allow = ["vpn_status"]
+
+[[permission]]
+identifier = "allow-vpn-logs"
+description = "Allows invoking the vpn_logs command"
+commands.allow = ["vpn_logs"]
+
+[[permission]]
+identifier = "allow-vpn-iface-traffic"
+description = "Allows invoking the vpn_iface_traffic command"
+commands.allow = ["vpn_iface_traffic"]
+
+[[permission]]
+identifier = "allow-ovpn-remote-hint"
+description = "Allows invoking the ovpn_remote_hint command"
+commands.allow = ["ovpn_remote_hint"]
+
+[[permission]]
+identifier = "allow-recent-profiles"
+description = "Allows invoking the recent_profiles command"
+commands.allow = ["recent_profiles"]
+
+[[permission]]
+identifier = "allow-reorder-recent-profiles"
+description = "Allows invoking the reorder_recent_profiles command"
+commands.allow = ["reorder_recent_profiles"]
+
+[[permission]]
+identifier = "allow-upsert-recent-profile"
+description = "Allows invoking the upsert_recent_profile command"
+commands.allow = ["upsert_recent_profile"]
+
+[[permission]]
+identifier = "allow-remove-recent-profile"
+description = "Allows invoking the remove_recent_profile command"
+commands.allow = ["remove_recent_profile"]
+
+[[permission]]
+identifier = "allow-history-entries"
+description = "Allows invoking the history_entries command"
+commands.allow = ["history_entries"]
+
+[[permission]]
+identifier = "allow-history-clear"
+description = "Allows invoking the history_clear command"
+commands.allow = ["history_clear"]
+
+[[permission]]
+identifier = "allow-set-profile-metadata"
+description = "Allows invoking the set_profile_metadata command"
+commands.allow = ["set_profile_metadata"]
+
+[[permission]]
+identifier = "allow-rename-profile-file"
+description = "Allows invoking the rename_profile_file command"
+commands.allow = ["rename_profile_file"]

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2026-05-21
+
+### Performance
+- **Aggressive Size Optimizations**:
+  - Changed Rust release profile `opt-level` from `s` to `z` (optimise for size).
+  - Enabled `"removeUnusedCommands": true` in `tauri.conf.json` to strip unused backend IPC command handlers from the compiled binary.
+  - Declared permissions for all custom application commands in `src-tauri/permissions/app-commands.toml` and linked them to `capabilities/default.json` to ensure functionality is retained when stripping unused commands.
+
 ## [0.2.2] - 2026-05-07
 
 ### Fixed
