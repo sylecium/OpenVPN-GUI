@@ -34,6 +34,6 @@
     "@tauri-apps/cli": "^2",
     "husky": "^9.1.7",
     "typescript": "~6.0.3",
-    "vite": "^6.0.3"
+    "vite": "^8.0.14"
   }
 }
