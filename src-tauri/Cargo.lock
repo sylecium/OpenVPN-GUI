@@ -2529,7 +2529,7 @@ dependencies = [
 
 [[package]]
 name = "openvpn-gui"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "openvpn-ipc",
  "serde",
